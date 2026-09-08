@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 416 283" role="img" aria-labelledby="title">
+  <title id="title">Request limit reached</title>
+  <rect x="142" y="31" width="242" height="216" rx="16" fill="#d7e9fa"/>
+  <g fill="#2a3647"><rect x="159" y="49" width="53" height="8" rx="4"/><rect x="222" y="49" width="53" height="8" rx="4"/><rect x="285" y="49" width="53" height="8" rx="4"/></g>
+  <g fill="#29abe2"><rect x="159" y="70" width="53" height="45" rx="4"/><rect x="222" y="70" width="53" height="76" rx="4"/><rect x="285" y="70" width="53" height="45" rx="4"/><rect x="159" y="126" width="53" height="73" rx="4"/><rect x="285" y="126" width="53" height="73" rx="4"/></g>
+  <g fill="#fff"><circle cx="185" cy="88" r="8"/><circle cx="248" cy="88" r="8"/><circle cx="311" cy="88" r="8"/><path d="M169 101h33v5h-33zm63 16h33v5h-33zm0 11h33v5h-33zm63 15h33v5h-33zm0 11h33v5h-33zm-126-4h33v5h-33zm0 11h33v5h-33z"/></g>
+  <circle cx="83" cy="61" r="23" fill="#2a3647"/><path d="M63 85c17-11 40-5 49 16l15 42-31 12-10-30-2 52-35-2 3-64c1-11 5-20 11-26z" fill="#2a3647"/>
+  <path d="M97 96l38-24 7 11-38 31z" fill="#2a3647"/><path d="M56 174l-8 61H35l1-65zm28 0l26 55-12 6-35-55z" fill="#177da8"/>
+  <circle cx="139" cy="77" r="7" fill="#ff3d00"/>
+</svg>

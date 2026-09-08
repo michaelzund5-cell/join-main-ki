@@ -1,0 +1,47 @@
+/* Schriftart */
+@font-face {
+   font-family: "Inter";
+   src: url(./assets/fonts/Inter-VariableFont_opsz\_wght.ttf);
+}
+
+@font-face {
+   font-family: "Poppins";
+   src: url(./assets/fonts/Poppins-Regular.ttf);
+}
+
+html {
+   background-color: #fff;
+   scrollbar-color: #2b3647;
+   cursor: default;
+}
+
+body {
+   font-size: 16px;
+   font-weight: 400;
+   font-family: "Inter";
+   line-height: 1.2;
+   color: #000;
+   min-height: 100vh;
+   display: flex;
+   justify-content: left;
+}
+
+
+
+h1 {
+   font-size: 61px;
+   font-weight: 700;
+}
+
+.app-loading button {
+   pointer-events: none;
+}
+
+@media (max-width: 820px) {
+   h1 {
+      font-size: 47px;
+   }
+}
+
+
+

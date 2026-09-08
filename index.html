@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+   <title>Welcome | Join</title>
+   <link rel="icon" href="./assets/icons/desktop/logoFavicon.svg" type="image/svg+xml" />
+   <link rel="stylesheet" href="./styles/standard.css" />
+   <link rel="stylesheet" href="./style.css" />
+   <link rel="stylesheet" href="./styles/stakeholder.css" />
+</head>
+<body class="stakeholder-page stakeholder-page--choice">
+   <main class="choice-shell">
+      <section class="choice-card" aria-labelledby="welcome-title">
+         <h1 id="welcome-title" class="choice-card__title">Welcome</h1>
+         <span class="choice-card__line" aria-hidden="true"></span>
+         <p class="choice-card__intro">Pick the option that suits your role: create a request as a stakeholder or log in if you’re part of the team.</p>
+         <div class="choice-card__actions">
+            <div class="choice-card__option">
+               <p><img class="choice-card__role-icon" src="./assets/icons/desktop/stakeholder-request.svg" alt="" /> Are you a stakeholder?</p>
+               <a class="stakeholder-button stakeholder-button--primary stakeholder-button--compact" href="./templates/stakeholder.html">Create request</a>
+            </div>
+            <div class="choice-card__option">
+               <p><img class="choice-card__role-icon" src="./assets/icons/desktop/team-member.svg" alt="" /> Are you a team member?</p>
+               <a class="stakeholder-button stakeholder-button--secondary" href="./templates/login.html">Member log in</a>
+            </div>
+         </div>
+      </section>
+   </main>
+   <footer class="stakeholder-footer">
+      <a href="./templates/privacy-Policy.html?from=welcome">Privacy Policy</a>
+      <a href="./templates/legalnotice.html?from=welcome">Legal notice</a>
+   </footer>
+</body>
+</html>

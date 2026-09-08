@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 416 283" role="img" aria-labelledby="title">
+  <title id="title">Create an email request</title>
+  <rect x="135" y="32" width="250" height="214" rx="16" fill="#d7e9fa"/>
+  <g fill="#2a3647"><rect x="153" y="49" width="54" height="8" rx="4"/><rect x="217" y="49" width="54" height="8" rx="4"/><rect x="281" y="49" width="54" height="8" rx="4"/></g>
+  <g fill="#29abe2"><rect x="153" y="70" width="54" height="45" rx="4"/><rect x="217" y="70" width="54" height="75" rx="4"/><rect x="281" y="70" width="54" height="45" rx="4"/><rect x="153" y="126" width="54" height="72" rx="4"/><rect x="281" y="126" width="54" height="72" rx="4"/></g>
+  <g fill="#fff"><circle cx="180" cy="88" r="8"/><circle cx="244" cy="88" r="8"/><circle cx="308" cy="88" r="8"/><path d="M163 101h34v5h-34zm64 16h34v5h-34zm0 11h34v5h-34zm64 15h34v5h-34zm0 11h34v5h-34zm-128-4h34v5h-34zm0 11h34v5h-34z"/></g>
+  <circle cx="91" cy="74" r="23" fill="#2a3647"/><path d="M75 70c4-22 35-25 42-4l-5 13-37-9z" fill="#2a3647"/>
+  <path d="M78 94c18-12 39-5 47 17l19 49-31 14-17-42-6 49-33-4 5-61c1-10 6-18 16-22z" fill="#29abe2"/>
+  <path d="M120 111l36 17-5 12-41-15zm-32 66l3 59-13 0-10-58zm24-4l29 54-12 6-37-49z" fill="#2a3647"/>
+  <path d="M148 123l24-34 8 6-20 43z" fill="#2a3647"/><rect x="170" y="75" width="12" height="25" rx="3" fill="#2a3647"/>
+</svg>

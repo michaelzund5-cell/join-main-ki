@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+   <title>Create Email Request | Join</title>
+   <link rel="icon" href="../assets/icons/desktop/logoFavicon.svg" type="image/svg+xml" />
+   <script src="../script.js"></script>
+   <script src="../scripts/stakeholder.js" defer></script>
+   <link rel="stylesheet" href="../styles/standard.css" />
+   <link rel="stylesheet" href="../style.css" />
+   <link rel="stylesheet" href="../styles/stakeholder.css" />
+</head>
+<body class="stakeholder-page">
+   <header class="stakeholder-header">
+      <img src="../assets/icons/desktop/Dark_Logo.svg" alt="Join" class="stakeholder-header__logo" />
+      <a href="../index.html" class="stakeholder-header__back" aria-label="Back to welcome">←</a>
+      <p id="requestCounter" class="stakeholder-counter" aria-live="polite">0 of 10 requests used today</p>
+   </header>
+   <main class="stakeholder-main">
+      <h1>Welcome</h1>
+      <section id="requestAvailable" class="stakeholder-content">
+         <div class="stakeholder-copy">
+            <h2>Easily create a ticket by sending an email — no extra steps needed.</h2>
+            <p>Send your feature request to <strong>diepausenclowns@gmail.com</strong>. Our AI system will automatically generate a ticket with a deadline and priority level.</p>
+            <p>A total of 10 requests can be created per day. After this limit, emails can still be sent, but they will be manually reviewed by our team instead of generating AI tickets.</p>
+            <a id="createEmailRequest" class="stakeholder-button stakeholder-button--primary" href="#">Create Email Request <span aria-hidden="true">✓</span></a>
+         </div>
+         <img src="../assets/illustrations/stakeholder-email-request.png" alt="A person creating a request on a board" class="stakeholder-illustration" />
+      </section>
+      <section id="requestLimitReached" class="stakeholder-content" hidden>
+         <div class="stakeholder-copy">
+            <p class="limit-alert">The daily 10-request limit has been reached!</p>
+            <p>Need more? No worries — you can still send emails, but our team will review them manually instead of using AI to create tickets.</p>
+            <a id="sendManualEmail" class="stakeholder-button stakeholder-button--primary" href="#">Send an email <span aria-hidden="true">✓</span></a>
+         </div>
+         <img src="../assets/illustrations/request-limit.svg" alt="A person reviewing the request limit" class="stakeholder-illustration stakeholder-illustration--limit" />
+      </section>
+   </main>
+   <footer class="stakeholder-footer">
+      <a href="privacy-Policy.html?from=stakeholder">Privacy Policy</a>
+      <a href="legalnotice.html?from=stakeholder">Legal notice</a>
+   </footer>
+</body>
+</html>
