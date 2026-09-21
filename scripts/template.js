@@ -160,7 +160,6 @@ function taskCardHTML(categoryClass, categoryLabel, title, description, subtasks
    return `
       <div class="task-card__topline">
          <span class="task-card__label ${categoryClass}">${categoryLabel}</span>
-         ${aiGeneratedHTML}
       </div>
       <h3 class="task-card__title">${title}</h3>
       <p class="task-card__description">${description}</p>
@@ -189,7 +188,7 @@ function taskCardHTML(categoryClass, categoryLabel, title, description, subtasks
  * @returns {string} The task card fallback HTML.
  */
 function taskCardFallbackHTML(categoryClass, categoryLabel, title, description, subtasksHTML, avatarsHTML, priorityIconSrc, aiGeneratedHTML = "") {
-   return `<div class="task-card__topline"><span class="task-card__label ${categoryClass}">${categoryLabel}</span>${aiGeneratedHTML}</div><h3 class="task-card__title">${title}</h3><p class="task-card__description">${description}</p>${subtasksHTML}<div class="task-card__meta"><div class="task-card__avatars">${avatarsHTML}</div><img class="task-card__priority" src="${priorityIconSrc}" alt="Priority" /></div>`;
+   return `<div class="task-card__topline"><span class="task-card__label ${categoryClass}">${categoryLabel}</span></div><h3 class="task-card__title">${title}</h3><p class="task-card__description">${description}</p>${subtasksHTML}<div class="task-card__meta"><div class="task-card__avatars">${avatarsHTML}</div><img class="task-card__priority" src="${priorityIconSrc}" alt="Priority" /></div>`;
 }
 
 

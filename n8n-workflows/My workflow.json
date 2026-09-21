@@ -1,0 +1,236 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "/**\n * Liest die strukturierte Gemini-Antwort aus und validiert\n * die Ticketdaten für die spätere Erstellung in Join.\n *\n * @returns {Array<{json: object}>} Validierte Ticketdaten\n */\nconst response = $input.first().json;\nconst source = $('Code in JavaScript1').first().json;\nconst rawText = response.candidates?.[0]?.content?.parts?.[0]?.text;\n\nif (!rawText) {\n  throw new Error(\n    'Gemini hat keine auswertbare Textantwort geliefert.'\n  );\n}\n\nconst cleanedText = rawText\n  .replace(/^```(?:json)?\\s*/i, '')\n  .replace(/\\s*```$/i, '')\n  .trim();\n\nlet ticket;\n\ntry {\n  ticket = JSON.parse(cleanedText);\n} catch (error) {\n  throw new Error(\n    `Gemini-Antwort ist kein gültiges JSON: ${error.message}`\n  );\n}\n\nconst allowedCategories = [\n  'Bug',\n  'User Story',\n  'Technical Task'\n];\n\nconst allowedPriorities = [\n  'urgent',\n  'medium',\n  'low'\n];\n\nif (!ticket.title || !ticket.description) {\n  throw new Error(\n    'Gemini-Antwort enthält keinen Titel oder keine Beschreibung.'\n  );\n}\n\nif (!allowedCategories.includes(ticket.category)) {\n  ticket.category = 'Technical Task';\n}\n\nif (!allowedPriorities.includes(ticket.priority)) {\n  ticket.priority = 'medium';\n}\n\n/**\n * Ermittelt das heutige Datum in der Zeitzone Zürich.\n */\nfunction getTodayInZurich() {\n  const parts = new Intl.DateTimeFormat('en-GB', {\n    timeZone: 'Europe/Zurich',\n    day: '2-digit',\n    month: '2-digit',\n    year: 'numeric'\n  }).formatToParts(new Date());\n\n  const values = Object.fromEntries(\n    parts.map(part => [part.type, part.value])\n  );\n\n  return {\n    day: values.day,\n    month: values.month,\n    year: values.year,\n    formatted: `${values.day}/${values.month}/${values.year}`,\n    comparable: Number(\n      `${values.year}${values.month}${values.day}`\n    )\n  };\n}\n\n/**\n * Prüft die Deadline.\n *\n * - Keine Deadline bleibt null.\n * - Ein ungültiges Datum wird auf heute gesetzt.\n * - Ein vergangenes Datum wird auf heute gesetzt.\n * - Gültige zukünftige Daten bleiben erhalten.\n */\nfunction validateDeadline(value) {\n  if (\n    value === null ||\n    value === undefined ||\n    String(value).trim() === ''\n  ) {\n    return null;\n  }\n\n  const input = String(value).trim();\n  const today = getTodayInZurich();\n\n  let day;\n  let month;\n  let year;\n\n  // DD/MM/YYYY, DD.MM.YYYY oder DD-MM-YYYY\n  let match = input.match(\n    /^(\\d{1,2})[./-](\\d{1,2})[./-](\\d{4})$/\n  );\n\n  if (match) {\n    day = match[1].padStart(2, '0');\n    month = match[2].padStart(2, '0');\n    year = match[3];\n  } else {\n    // YYYY-MM-DD\n    match = input.match(\n      /^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/\n    );\n\n    if (!match) {\n      return today.formatted;\n    }\n\n    year = match[1];\n    month = match[2].padStart(2, '0');\n    day = match[3].padStart(2, '0');\n  }\n\n  const parsedDate = new Date(\n    Date.UTC(\n      Number(year),\n      Number(month) - 1,\n      Number(day)\n    )\n  );\n\n  const isValid =\n    parsedDate.getUTCFullYear() === Number(year) &&\n    parsedDate.getUTCMonth() === Number(month) - 1 &&\n    parsedDate.getUTCDate() === Number(day);\n\n  if (!isValid) {\n    return today.formatted;\n  }\n\n  const comparable = Number(`${year}${month}${day}`);\n\n  if (comparable < today.comparable) {\n    return today.formatted;\n  }\n\n  return `${day}/${month}/${year}`;\n}\n\n/**\n * Subtasks vereinheitlichen.\n * Unterstützt Strings und Objekte.\n * Es gibt keine Begrenzung auf zwei Subtasks.\n */\nconst subtasks = Array.isArray(ticket.subtasks)\n  ? ticket.subtasks\n      .map((subtask, index) => {\n        const title =\n          typeof subtask === 'string'\n            ? subtask.trim()\n            : String(\n                subtask?.title ||\n                subtask?.name ||\n                subtask?.text ||\n                ''\n              ).trim();\n\n        if (!title) {\n          return null;\n        }\n\n        return {\n          id: Date.now() + index + 1,\n          title,\n          completed: false\n        };\n      })\n      .filter(Boolean)\n  : [];\n\n/**\n * Entfernt eine versehentlich zusätzlich ausgegebene\n * Subtask-Liste aus der Beschreibung.\n */\nconst description = String(ticket.description)\n  .replace(\n    /\\s*(?:Subtasks?|Teilaufgaben|Aufgaben)\\s*:\\s*[\\s\\S]*$/i,\n    ''\n  )\n  .trim();\n\nreturn [\n  {\n    json: {\n      sender: source.sender,\n      subject: source.subject,\n      body: source.body,\n      title: String(ticket.title).trim(),\n      description,\n      category: ticket.category,\n      priority: ticket.priority,\n      deadline: validateDeadline(ticket.deadline),\n      status: 'triage',\n      creatorType: 'external',\n      aiGenerated: true,\n      subtasks\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -272
+      ],
+      "id": "f4ccb1e1-67df-4ae4-8d01-d577fd1a8dfa",
+      "name": "Gemini Ticketdaten parsen"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1f2352c-3959-4137-90dd-7b59d55dee7a",
+              "name": "sender",
+              "value": "={{ $json.From || $json.from || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "e38b3f1f-f63f-48ea-aa2c-da694d11a133",
+              "name": "subject",
+              "value": "={{ $json.Subject || $json.subject || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a741b514-d795-4aaf-aca8-5b72a6411f1e",
+              "name": "body",
+              "value": "={{ $json.textPlain || $json.text || $json.snippet || \"\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -272
+      ],
+      "id": "0c9d80c1-80fa-4de4-8639-eae34957b957",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Erstellt aus einer eingehenden E-Mail einen Prompt\n * für die strukturierte KI-Auswertung.\n *\n * @returns {Array<{json: object}>} E-Mail-Daten und KI-Prompt\n */\nconst email = $input.first().json;\nconst values = Object.values(email);\n\nconst sender =\n  email.sender ??\n  email.Sender ??\n  email.Absender ??\n  email.From ??\n  email.from ??\n  values[0] ??\n  \"\";\n\nconst subject =\n  email.subject ??\n  email.Subject ??\n  email.Subjekt ??\n  email.Betreff ??\n  values[1] ??\n  \"\";\n\nconst body =\n  email.body ??\n  email.Body ??\n  email.Körper ??\n  email.Nachricht ??\n  email.textPlain ??\n  email.text ??\n  email.snippet ??\n  values[2] ??\n  \"\";\n\n/**\n * Aktuelles Datum für die Zeitzone Zürich ermitteln.\n */\nconst currentDate = new Intl.DateTimeFormat(\"de-CH\", {\n  timeZone: \"Europe/Zurich\",\n  day: \"2-digit\",\n  month: \"2-digit\",\n  year: \"numeric\"\n}).format(new Date());\n\nconst aiPrompt = `\nAnalysiere die folgende E-Mail und antworte ausschließlich mit gültigem JSON.\n\nDas heutige Datum ist: ${currentDate}\n\nErforderliches Format:\n{\n  \"title\": \"Kurzer prägnanter Titel\",\n  \"description\": \"Bereinigte Ticketbeschreibung ohne Subtasks\",\n  \"category\": \"Bug oder User Story oder Technical Task\",\n  \"priority\": \"urgent oder medium oder low\",\n  \"deadline\": \"DD/MM/YYYY oder null\",\n  \"subtasks\": [\n    \"Erster Subtask\",\n    \"Zweiter Subtask\"\n  ]\n}\n\nRegeln:\n- Kategorie muss Bug, User Story oder Technical Task sein.\n- Priorität muss urgent, medium oder low sein.\n- Übernimm eine Deadline nur, wenn in der E-Mail eine genannt wurde.\n- Erfinde keine Deadline, wenn keine angegeben wurde.\n- Eine Deadline darf niemals in der Vergangenheit liegen.\n- Wenn eine angegebene Deadline ungültig ist oder in der Vergangenheit liegt, verwende das heutige Datum ${currentDate}.\n- Verwende für die Deadline ausschließlich das Format DD/MM/YYYY.\n- Extrahiere alle genannten Subtasks vollständig in das Array \"subtasks\".\n- Es dürfen beliebig viele Subtasks vorhanden sein.\n- Jeder Subtask muss ein eigener Eintrag im Array sein.\n- Schreibe die Subtasks nicht zusätzlich in die Beschreibung.\n- Wenn keine Subtasks genannt wurden, verwende ein leeres Array: [].\n- Die Beschreibung soll nur die eigentliche Anfrage enthalten.\n- Antworte ausschließlich mit dem JSON-Objekt und ohne Markdown.\n\nAbsender: ${sender}\nBetreff: ${subject}\nNachricht: ${body}\n`;\n\nreturn [\n  {\n    json: {\n      sender,\n      subject,\n      body,\n      aiPrompt\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -272
+      ],
+      "id": "1bd42f5e-8a81-4c10-91df-a190595546e9",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { contents: [{ role: 'user', parts: [{ text: $json.aiPrompt }] }], generationConfig: { responseMimeType: 'application/json' } } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        832,
+        -272
+      ],
+      "id": "bb42317b-a611-41d5-a00f-667f0f04ef13",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ybWBD6EaBdXg6mtx",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/tasks.json",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  id: Date.now(),\n  title: $json.title,\n  description: $json.description,\n  category: $json.category,\n  priority: $json.priority,\n  date: $json.deadline || \"\",\n  status: \"triage\",\n  source: \"email\",\n  aiGenerated: true,\n  creator: {\n    email: $json.sender,\n    type: \"external\"\n  },\n  assigned: [],\n  subtasks: $json.subtasks || []\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1264,
+        -272
+      ],
+      "id": "7b183b02-a1cd-4b55-8236-1736ee529d20",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        192,
+        -464
+      ],
+      "id": "f49cfc99-1b7f-4ddc-ab8a-2f13ab94b2c4",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZxAJkmKbnrxawUJA",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/emailRequestUsage/{{ $now.setZone('Europe/Zurich').toFormat('yyyy-MM-dd') }}.json",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \".sv\": {\n    \"increment\": 1\n  }\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1456,
+        -272
+      ],
+      "id": "27287858-a3a5-4869-a7d8-8f30998a67ed",
+      "name": "HTTP Request2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Gemini Ticketdaten parsen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Ticketdaten parsen": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "44b50faf-972f-4388-b0cb-a46b6e47e088",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb6f49aa55a9701e023ab489eaa6447f42dc3749e9339d5004b6190e7f1c2d08"
+  },
+  "nodeGroups": [],
+  "id": "tK0eHDFXZQv6e89H",
+  "tags": []
+}

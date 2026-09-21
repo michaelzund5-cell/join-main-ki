@@ -22,23 +22,6 @@
    gap: 10px;
 }
 
-.task-card__ai-badge {
-   width: fit-content;
-   max-width: 100%;
-   display: inline-flex;
-   align-items: center;
-   gap: 6px;
-   color: #754cff;
-   font-size: 14px;
-   font-weight: 400;
-   line-height: 1.2;
-}
-
-.task-card__ai-badge img {
-   width: 18px;
-   height: 18px;
-}
-
 .task-card[draggable="true"] {
    cursor: grab;
 }

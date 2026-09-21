@@ -4,11 +4,14 @@ const REQUEST_DAILY_LIMIT = 10;
 const REQUEST_EMAIL = window.JOIN_CONFIG?.FEATURE_REQUEST_EMAIL || "diepausenclowns@gmail.com";
 const REQUEST_BASE_URL = window.JOIN_CONFIG?.BASE_URL || "";
 
-/** Returns today's local date key in YYYY-MM-DD form. */
+/** Returns today's Zurich date key in YYYY-MM-DD form. */
 function getRequestDateKey() {
-   const now = new Date();
-   const offset = now.getTimezoneOffset() * 60000;
-   return new Date(now.getTime() - offset).toISOString().slice(0, 10);
+   return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Zurich",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+   }).format(new Date());
 }
 
 /** Converts a Firebase counter value into a safe non-negative integer. */
@@ -22,7 +25,9 @@ function normalizeRequestCount(value) {
 async function loadRequestCount() {
    if (!REQUEST_BASE_URL) return 0;
    try {
-      const response = await fetch(`${REQUEST_BASE_URL}emailRequestUsage/${getRequestDateKey()}.json`);
+      const response = await fetch(`${REQUEST_BASE_URL}emailRequestUsage/${getRequestDateKey()}.json`, {
+         cache: "no-store",
+      });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return normalizeRequestCount(await response.json());
    } catch (error) {
@@ -62,3 +67,14 @@ async function initializeStakeholderPage() {
 }
 
 document.addEventListener("DOMContentLoaded", initializeStakeholderPage);
+
+/** Refreshes the counter whenever the user returns from the mail application. */
+async function refreshRequestState() {
+   renderRequestState(await loadRequestCount());
+}
+
+window.addEventListener("focus", refreshRequestState);
+window.addEventListener("pageshow", refreshRequestState);
+document.addEventListener("visibilitychange", () => {
+   if (document.visibilityState === "visible") refreshRequestState();
+});

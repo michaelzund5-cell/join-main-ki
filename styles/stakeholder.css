@@ -474,6 +474,7 @@ body.stakeholder-page--choice {
 
    .stakeholder-main > h1 {
       margin-bottom: 32px;
+      text-align: left;
    }
 
    .stakeholder-content {
@@ -493,7 +494,7 @@ body.stakeholder-page--choice {
    }
 
    .stakeholder-illustration {
-      grid-row: 1;
+      grid-row: auto;
       justify-self: center;
    }
 
@@ -529,6 +530,7 @@ body.stakeholder-page--choice {
    .stakeholder-main > h1 {
       margin-bottom: 24px;
       font-size: 38px;
+      text-align: left;
    }
 
    .stakeholder-copy h2 {

@@ -12,7 +12,7 @@
 
    <script src="../scripts/global-auth-routing.js"></script>
    <script src="../script.js"></script>
-   <script src="../scripts/tasks/saveTask.js"></script>
+   <script src="../scripts/tasks/saveTask.js?v=20260920b"></script>
    <script src="../scripts/tasks/saveTask-success-redirect.js"></script>
    <script src="../scripts/template.js"></script>
    <script src="../scripts/board/board-data.js"></script>
@@ -21,7 +21,7 @@
    <script src="../scripts/board/board-cards-render.js"></script>
    <script src="../scripts/board/board-dragdrop.js"></script>
    <script src="../scripts/board/board-task-detail-form.js"></script>
-   <script src="../scripts/board/board-task-detail-render.js"></script>
+   <script src="../scripts/board/board-task-detail-render.js?v=20260920b"></script>
    <script src="../scripts/board/board-task-detail.js"></script>
    <script src="../scripts/board/board.js"></script>
    <script src="../scripts/tasks/add-task-validation.js"></script>
@@ -51,7 +51,7 @@
    <link rel="stylesheet" href="../styles/board/layout.css" />
    <link rel="stylesheet" href="../styles/board/controls.css" />
    <link rel="stylesheet" href="../styles/board/cards.css" />
-   <link rel="stylesheet" href="../styles/board/task-detail.css" />
+   <link rel="stylesheet" href="../styles/board/task-detail.css?v=20260920b" />
    <link rel="stylesheet" href="../styles/board/responsive.css" />
    <link rel="stylesheet" href="../styles/add-task/board-dialog.css" />
 </head>
@@ -512,6 +512,12 @@
             <section class="task-detail__content">
                <h2 id="taskDetailTitle" class="task-detail__title"></h2>
                <p id="taskDetailDescription" class="task-detail__description"></p>
+
+               <div class="task-detail__field task-detail__creator">
+                  <span class="task-detail__field-label">Creator:</span>
+                  <span id="taskDetailCreatorType" class="task-detail__creator-badge">Internal</span>
+                  <a id="taskDetailCreatorEmail" class="task-detail__creator-email" href="#">Team member</a>
+               </div>
 
                <div class="task-detail__field">
                   <span class="task-detail__field-label">Due date:</span>

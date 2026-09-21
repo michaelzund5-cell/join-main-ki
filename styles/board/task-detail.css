@@ -19,17 +19,18 @@
 }
 
 .task-detail__header {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
+   display: grid;
+   grid-template-columns: minmax(0, 1fr) 32px;
+   align-items: start;
+   gap: 16px;
    padding: 24px 24px 0;
 }
 
 .task-detail__topline {
    display: flex;
    align-items: center;
-   flex-wrap: wrap;
-   gap: 10px;
+   min-width: 0;
+   gap: 12px;
 }
 
 .task-detail__ai-badge {
@@ -40,6 +41,16 @@
    font-size: 16px;
    font-weight: 400;
    line-height: 1.2;
+   white-space: nowrap;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+   .task-detail__ai-badge {
+      color: transparent;
+      background: linear-gradient(90deg, #8933fc 0%, #29abe2 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+   }
 }
 
 .task-detail__ai-badge[hidden] {
@@ -52,12 +63,14 @@
 }
 
 .task-detail__label {
+   flex: 0 0 auto;
    font-size: 16px;
    font-weight: 400;
    color: #ffffff;
    padding: 4px 18px;
    border-radius: 8px;
    background: #0038ff;
+   white-space: nowrap;
 }
 
 .task-detail__label--teal {
@@ -74,6 +87,7 @@
    border-radius: 50%;
    background: transparent;
    cursor: pointer;
+   justify-self: end;
 }
 
 .task-detail__close:hover {
@@ -115,6 +129,43 @@
 .task-detail__field-value {
    font-size: 20px;
    color: #000000;
+}
+
+.task-detail__creator {
+   flex-wrap: wrap;
+   gap: 10px;
+}
+
+.task-detail__creator-badge {
+   display: inline-flex;
+   align-items: center;
+   min-height: 28px;
+   padding: 3px 9px;
+   border-radius: 8px;
+   background: #dfe7f2;
+   color: #2a3647;
+   font-size: 16px;
+   line-height: 1.2;
+}
+
+.task-detail__creator-badge--external {
+   background: #e8ff74;
+}
+
+.task-detail__creator-email {
+   color: #2a3647;
+   font-size: 18px;
+   overflow-wrap: anywhere;
+   text-decoration: none;
+}
+
+.task-detail__creator-email[href^="mailto:"]:hover {
+   color: #29abe2;
+   text-decoration: underline;
+}
+
+.task-detail__creator-email[aria-disabled="true"] {
+   pointer-events: none;
 }
 
 .task-detail__priority {
@@ -256,7 +307,27 @@ dialog::backdrop {
    }
 
    .task-detail__header {
+      gap: 10px;
       padding: 18px 18px 0;
+   }
+
+   .task-detail__topline {
+      gap: 8px;
+   }
+
+   .task-detail__label {
+      padding: 4px 10px;
+      font-size: 14px;
+   }
+
+   .task-detail__ai-badge {
+      gap: 4px;
+      font-size: 14px;
+   }
+
+   .task-detail__ai-badge img {
+      width: 18px;
+      height: 18px;
    }
 
    .task-detail__content {

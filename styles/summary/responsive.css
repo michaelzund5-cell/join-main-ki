@@ -150,6 +150,7 @@
       height: auto;
       min-height: 120px;
       padding: 20px 12px;
+      grid-column: 1;
    }
 
    .summary__urgent {
