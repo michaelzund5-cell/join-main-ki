@@ -1,19 +1,18 @@
 {
-  "name": "Join KI Issue Collector",
+  "name": "My workflow",
   "nodes": [
     {
       "parameters": {
-        "jsCode": "/**\n * Validiert Geminis JSON, korrigiert Deadlines und normalisiert Subtasks.\n * @returns {Array<{json: object}>} Validierte Ticketdaten\n */\nconst response = $input.first().json;\nconst source = $('Gemini-Prompt erstellen').first().json;\nconst rawText = response.candidates?.[0]?.content?.parts?.[0]?.text;\nif (!rawText) throw new Error('Gemini hat keine auswertbare Textantwort geliefert.');\n\nconst cleanedText = rawText.replace(/^```(?:json)?\\s*/i, '').replace(/\\s*```$/i, '').trim();\nlet ticket;\ntry { ticket = JSON.parse(cleanedText); }\ncatch (error) { throw new Error(`Gemini-Antwort ist kein gültiges JSON: ${error.message}`); }\n\nconst allowedCategories = ['Bug', 'User Story', 'Technical Task'];\nconst allowedPriorities = ['urgent', 'medium', 'low'];\nif (!ticket.title || !ticket.description) throw new Error('Titel oder Beschreibung fehlt.');\nif (!allowedCategories.includes(ticket.category)) ticket.category = 'Technical Task';\nif (!allowedPriorities.includes(ticket.priority)) ticket.priority = 'medium';\n\nfunction getTodayInZurich() {\n  const parts = new Intl.DateTimeFormat('en-GB', {\n    timeZone: 'Europe/Zurich', day: '2-digit', month: '2-digit', year: 'numeric'\n  }).formatToParts(new Date());\n  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));\n  return {\n    formatted: `${values.day}/${values.month}/${values.year}`,\n    comparable: Number(`${values.year}${values.month}${values.day}`)\n  };\n}\n\nfunction validateDeadline(value) {\n  if (value === null || value === undefined || String(value).trim() === '') return null;\n  const input = String(value).trim();\n  const today = getTodayInZurich();\n  let day, month, year;\n  let match = input.match(/^(\\d{1,2})[./-](\\d{1,2})[./-](\\d{4})$/);\n  if (match) {\n    day = match[1].padStart(2, '0'); month = match[2].padStart(2, '0'); year = match[3];\n  } else {\n    match = input.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);\n    if (!match) return today.formatted;\n    year = match[1]; month = match[2].padStart(2, '0'); day = match[3].padStart(2, '0');\n  }\n  const parsed = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));\n  const valid = parsed.getUTCFullYear() === Number(year) && parsed.getUTCMonth() === Number(month) - 1 && parsed.getUTCDate() === Number(day);\n  if (!valid || Number(`${year}${month}${day}`) < today.comparable) return today.formatted;\n  return `${day}/${month}/${year}`;\n}\n\nconst subtasks = Array.isArray(ticket.subtasks)\n  ? ticket.subtasks.map((subtask, index) => {\n      const title = typeof subtask === 'string'\n        ? subtask.trim()\n        : String(subtask?.title || subtask?.text || subtask?.name || '').trim();\n      return title ? { id: Date.now() + index + 1, title, text: title, completed: false } : null;\n    }).filter(Boolean)\n  : [];\n\nconst description = String(ticket.description)\n  .replace(/\\s*(?:Subtasks?|Teilaufgaben|Aufgaben)\\s*:\\s*[\\s\\S]*$/i, '')\n  .replace(/\\s*Dieses Ticket wurde (?:KI|AI)-generiert\\.?$/i, '')\n  .trim();\n\nreturn [{ json: {\n  sender: source.sender,\n  senderRaw: source.senderRaw,\n  creatorName: source.creatorName,\n  subject: source.subject,\n  body: source.body,\n  title: String(ticket.title).trim(),\n  description,\n  category: ticket.category,\n  priority: ticket.priority,\n  deadline: validateDeadline(ticket.deadline),\n  status: 'triage',\n  creatorType: 'external',\n  aiGenerated: true,\n  subtasks\n} }];"
+        "jsCode": "/**\n * Liest die strukturierte Gemini-Antwort aus und validiert\n * die Ticketdaten für die spätere Erstellung in Join.\n *\n * @returns {Array<{json: object}>} Validierte Ticketdaten\n */\nconst response = $input.first().json;\nconst source = $('Code in JavaScript1').first().json;\nconst rawText = response.candidates?.[0]?.content?.parts?.[0]?.text;\n\nif (!rawText) {\n  throw new Error('Gemini hat keine auswertbare Textantwort geliefert.');\n}\n\nconst cleanedText = rawText\n  .replace(/^```(?:json)?\\s*/i, '')\n  .replace(/\\s*```$/i, '')\n  .trim();\n\nlet ticket;\ntry {\n  ticket = JSON.parse(cleanedText);\n} catch (error) {\n  throw new Error(`Gemini-Antwort ist kein gültiges JSON: ${error.message}`);\n}\n\nconst allowedCategories = ['Bug', 'User Story', 'Technical Task'];\nconst allowedPriorities = ['urgent', 'medium', 'low'];\n\nif (!ticket.title || !ticket.description) {\n  throw new Error('Gemini-Antwort enthält keinen Titel oder keine Beschreibung.');\n}\n\nif (!allowedCategories.includes(ticket.category)) {\n  ticket.category = 'Technical Task';\n}\n\nif (!allowedPriorities.includes(ticket.priority)) {\n  ticket.priority = 'medium';\n}\n\nreturn [{\n  json: {\n    sender: source.sender,\n    subject: source.subject,\n    body: source.body,\n    title: String(ticket.title).trim(),\n    description: String(ticket.description).trim(),\n    category: ticket.category,\n    priority: ticket.priority,\n    deadline: ticket.deadline || null,\n    status: 'triage',\n    creatorType: 'external',\n    aiGenerated: true\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1728,
-        -560
+        1040,
+        -272
       ],
       "id": "f4ccb1e1-67df-4ae4-8d01-d577fd1a8dfa",
-      "name": "Gemini-Antwort validieren",
-      "onError": "continueErrorOutput"
+      "name": "Gemini Ticketdaten parsen"
     },
     {
       "parameters": {
@@ -44,24 +43,24 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        416,
-        -464
+        448,
+        -272
       ],
       "id": "0c9d80c1-80fa-4de4-8639-eae34957b957",
-      "name": "E-Mail-Daten normalisieren"
+      "name": "Edit Fields1"
     },
     {
       "parameters": {
-        "jsCode": "/**\n * Erstellt aus einer normalisierten E-Mail einen strukturierten Gemini-Prompt.\n * @returns {Array<{json: object}>} E-Mail-Daten und KI-Prompt\n */\nconst email = $('E-Mail-Daten normalisieren').first().json;\nconst senderRaw = String(email.sender || '').trim();\nconst emailMatch = senderRaw.match(/<([^<>@]+@[^<>]+)>/) || senderRaw.match(/[w.+-]+@[w.-]+.[A-Za-z]{2,}/);\nconst sender = emailMatch ? (emailMatch[1] || emailMatch[0]) : senderRaw;\nconst creatorName = senderRaw\n  .replace(/<[^<>]+>/g, '')\n  .replace(sender, '')\n  .replace(/^[\"']|[\"']$/g, '')\n  .trim();\nconst subject = email.subject || '';\nconst body = email.body || '';\nconst currentDate = new Intl.DateTimeFormat('de-CH', {\n  timeZone: 'Europe/Zurich',\n  day: '2-digit',\n  month: '2-digit',\n  year: 'numeric'\n}).format(new Date());\n\nconst aiPrompt = `\nAnalysiere die folgende E-Mail und antworte ausschließlich mit gültigem JSON.\nDas heutige Datum ist: ${currentDate}\n\nErforderliches Format:\n{\n  \"title\": \"Kurzer prägnanter Titel\",\n  \"description\": \"Bereinigte Ticketbeschreibung ohne Subtasks\",\n  \"category\": \"Bug oder User Story oder Technical Task\",\n  \"priority\": \"urgent oder medium oder low\",\n  \"deadline\": \"DD/MM/YYYY oder null\",\n  \"subtasks\": [\"Erster Subtask\", \"Zweiter Subtask\"]\n}\n\nRegeln:\n- Kategorie muss Bug, User Story oder Technical Task sein.\n- Priorität muss urgent, medium oder low sein.\n- Erfinde keine Deadline, wenn keine angegeben wurde.\n- Vergangene oder ungültige Deadlines werden auf heute (${currentDate}) korrigiert.\n- Verwende für Deadlines ausschließlich DD/MM/YYYY.\n- Extrahiere alle genannten Subtasks einzeln und vollständig.\n- Es gibt keine Begrenzung der Subtask-Anzahl.\n- Schreibe Subtasks nicht zusätzlich in die Beschreibung.\n- Wenn keine Subtasks genannt wurden, verwende [].\n- Antworte ohne Markdown, ausschließlich mit dem JSON-Objekt.\n\nAbsender: ${senderRaw}\nBetreff: ${subject}\nNachricht: ${body}\n`;\n\nreturn [{ json: { sender, senderRaw, creatorName, subject, body, aiPrompt } }];"
+        "jsCode": "/**\n * Erstellt aus einer eingehenden E-Mail einen Prompt\n * für die strukturierte KI-Auswertung.\n *\n * @returns {Array<{json: object}>} E-Mail-Daten und KI-Prompt\n */\nconst email = $input.first().json;\nconst values = Object.values(email);\n\nconst sender =\n  email.sender ??\n  email.Sender ??\n  email.Absender ??\n  values[0] ??\n  \"\";\n\nconst senderEmailMatch = String(sender).match(/<([^<>@]+@[^<>]+)>/) ||\n  String(sender).match(/[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}/);\nconst senderEmail = senderEmailMatch ? (senderEmailMatch[1] || senderEmailMatch[0]) : \"\";\n\nconst subject =\n  email.subject ??\n  email.Subject ??\n  email.Subjekt ??\n  email.Betreff ??\n  values[1] ??\n  \"\";\n\nconst body =\n  email.body ??\n  email.Body ??\n  email.Körper ??\n  email.Nachricht ??\n  values[2] ??\n  \"\";\n\nconst aiPrompt = `\nAnalysiere die folgende E-Mail und antworte ausschließlich mit gültigem JSON.\n\nErforderliches Format:\n{\n  \"title\": \"Kurzer prägnanter Titel\",\n  \"description\": \"Bereinigte Ticketbeschreibung\",\n  \"category\": \"Bug oder User Story oder Technical Task\",\n  \"priority\": \"urgent oder medium oder low\",\n  \"deadline\": \"DD/MM/YYYY oder null\"\n}\n\nRegeln:\n- Kategorie muss Bug, User Story oder Technical Task sein.\n- Priorität muss urgent, medium oder low sein.\n- Erfinde keine Deadline.\n- Ergänze in der Beschreibung: Dieses Ticket wurde KI-generiert.\n\nAbsender: ${sender}\nBetreff: ${subject}\nNachricht: ${body}\n`;\n\nreturn [\n  {\n    json: {\n      sender,\n      senderEmail,\n      subject,\n      body,\n      aiPrompt\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1280,
-        -560
+        656,
+        -272
       ],
       "id": "1bd42f5e-8a81-4c10-91df-a190595546e9",
-      "name": "Gemini-Prompt erstellen"
+      "name": "Code in JavaScript1"
     },
     {
       "parameters": {
@@ -77,18 +76,17 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        1504,
-        -560
+        832,
+        -272
       ],
       "id": "bb42317b-a611-41d5-a00f-667f0f04ef13",
-      "name": "Gemini-Ticket analysieren",
+      "name": "HTTP Request1",
       "credentials": {
         "httpHeaderAuth": {
           "id": "ybWBD6EaBdXg6mtx",
           "name": "Header Auth account 2"
         }
-      },
-      "onError": "continueErrorOutput"
+      }
     },
     {
       "parameters": {
@@ -96,18 +94,17 @@
         "url": "https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/tasks.json",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  id: Date.now(),\n  title: $json.title,\n  description: $json.description,\n  category: $json.category,\n  priority: $json.priority,\n  date: $json.deadline || \"\",\n  status: \"triage\",\n  source: \"email\",\n  aiGenerated: true,\n  creator: {\n    name: $json.creatorName || \"\",\n    email: $json.sender,\n    raw: $json.senderRaw || $json.sender,\n    type: \"external\"\n  },\n  assigned: [],\n  subtasks: $json.subtasks || []\n} }}",
+        "jsonBody": "={{ {\n  id: Date.now(),\n  title: $json.title,\n  description: $json.description,\n  category: $json.category,\n  priority: $json.priority,\n  date: $json.deadline || \"\",\n  status: \"triage\",\n  source: \"email\",\n  aiGenerated: true,\n  creator: {\n    email: $json.sender,\n    type: \"external\"\n  },\n  assigned: [],\n  subtasks: []\n} }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        1936,
-        -560
+        1264,
+        -272
       ],
       "id": "7b183b02-a1cd-4b55-8236-1736ee529d20",
-      "name": "Ticket in Firebase erstellen",
-      "onError": "continueErrorOutput"
+      "name": "HTTP Request"
     },
     {
       "parameters": {
@@ -118,9 +115,7 @@
             }
           ]
         },
-        "filters": {
-          "q": "subject:\"Join feature request\""
-        }
+        "filters": {}
       },
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.4,
@@ -149,157 +144,27 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        2144,
-        -560
+        1456,
+        -272
       ],
       "id": "27287858-a3a5-4869-a7d8-8f30998a67ed",
-      "name": "Tageszähler erhöhen",
-      "onError": "continueErrorOutput"
+      "name": "HTTP Request2"
     },
     {
-      "id": "675b8d75-6220-47fa-886a-1acd249bd8ce",
-      "name": "Heutigen Request-Zähler laden",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.5,
-      "position": [
-        640,
-        -464
-      ],
       "parameters": {
-        "url": "=https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/emailRequestUsage/{{ $now.setZone('Europe/Zurich').toFormat('yyyy-MM-dd') }}.json",
-        "options": {}
-      },
-      "alwaysOutputData": true,
-      "onError": "continueErrorOutput"
-    },
-    {
-      "id": "9ac906c3-5b25-4c8f-8450-00c2136638bd",
-      "name": "Tageslimit auswerten",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        848,
-        -464
-      ],
-      "parameters": {
-        "jsCode": "/** Prüft das tägliche Limit vor jedem Gemini-Aufruf. */\nconst raw = $input.first().json;\nconst value = typeof raw === 'number' ? raw : Number(raw?.value ?? raw?.data ?? 0);\nconst count = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;\nreturn [{ json: { count, allowed: count < 10 } }];"
-      }
-    },
-    {
-      "id": "5b507a89-afc0-4ea0-a64e-ec6e1574aa35",
-      "name": "Unter Tageslimit?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        1056,
-        -464
-      ],
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "3fe24ffd-71d2-45ba-aa9a-92d4ba891899",
-              "leftValue": "={{ $json.allowed }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      }
-    },
-    {
-      "id": "138a4992-8de0-4bdd-9ef2-c1d838c7fcdc",
-      "name": "Tageslimit-Hinweis senden",
-      "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.1,
-      "position": [
-        1280,
-        -336
-      ],
-      "parameters": {
-        "sendTo": "={{ $('E-Mail-Daten normalisieren').first().json.sender }}",
-        "subject": "Join: Tageslimit erreicht",
-        "message": "Deine Anfrage ist angekommen. Das tägliche Limit von 10 KI-Tickets ist erreicht; die Anfrage wird manuell geprüft.",
-        "options": {}
-      },
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "I6kk1CBv0PbSdaLM",
-          "name": "Gmail account"
-        }
-      }
-    },
-    {
-      "id": "0934d327-ed9b-4f51-810f-825a4fe824d5",
-      "name": "Erfolg bestätigen",
-      "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.1,
-      "position": [
-        2144,
-        -560
-      ],
-      "parameters": {
-        "sendTo": "={{ $('E-Mail-Daten normalisieren').first().json.sender }}",
+        "sendTo": "={{ $('Code in JavaScript1').first().json.senderEmail }}",
         "subject": "Join: Ticket erfolgreich erstellt",
-        "message": "Deine Anfrage wurde erfolgreich als KI-Ticket in der Triage-Spalte erstellt.",
+        "message": "Deine Anfrage wurde erfolgreich verarbeitet und als Ticket in der Triage-Spalte erstellt.",
         "options": {}
       },
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "I6kk1CBv0PbSdaLM",
-          "name": "Gmail account"
-        }
-      }
-    },
-    {
-      "id": "f4bbc3dd-edbd-499a-b597-5878a329b748",
-      "name": "Fehlerbenachrichtigung senden",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1728,
-        -176
+        1664,
+        -272
       ],
-      "parameters": {
-        "sendTo": "={{ $('E-Mail-Daten normalisieren').first().json.sender }}",
-        "subject": "Join: Anfrage konnte nicht verarbeitet werden",
-        "message": "Leider konnte deine Anfrage nicht automatisch verarbeitet werden. Sie wurde nicht als Ticket angelegt. Bitte versuche es später erneut.",
-        "options": {}
-      },
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "I6kk1CBv0PbSdaLM",
-          "name": "Gmail account"
-        }
-      }
-    },
-    {
-      "id": "a7f11bd6-c59c-4323-9bf7-17db7691baaf",
-      "name": "Fehler intern melden",
-      "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.1,
-      "position": [
-        1952,
-        -176
-      ],
-      "parameters": {
-        "sendTo": "diepausenclowns@gmail.com",
-        "subject": "Join Workflow-Fehler",
-        "message": "=Die Anfrage von {{ $('E-Mail-Daten normalisieren').first().json.sender }} ist fehlgeschlagen. Execution: {{ $execution.id }}. Fehler: {{ $json.error?.message || $json.message || 'Unbekannter Fehler' }}",
-        "options": {}
-      },
+      "id": "9cbed82a-3f99-4f64-af56-57a98db68e61",
+      "name": "Erfolg bestätigen",
       "credentials": {
         "gmailOAuth2": {
           "id": "I6kk1CBv0PbSdaLM",
@@ -310,163 +175,77 @@
   ],
   "pinData": {},
   "connections": {
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Gemini Ticketdaten parsen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Ticketdaten parsen": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Gmail Trigger": {
       "main": [
         [
           {
-            "node": "E-Mail-Daten normalisieren",
+            "node": "Edit Fields1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "E-Mail-Daten normalisieren": {
+    "HTTP Request": {
       "main": [
         [
           {
-            "node": "Heutigen Request-Zähler laden",
+            "node": "HTTP Request2",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Heutigen Request-Zähler laden": {
-      "main": [
-        [
-          {
-            "node": "Tageslimit auswerten",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fehlerbenachrichtigung senden",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Tageslimit auswerten": {
-      "main": [
-        [
-          {
-            "node": "Unter Tageslimit?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Unter Tageslimit?": {
-      "main": [
-        [
-          {
-            "node": "Gemini-Prompt erstellen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Tageslimit-Hinweis senden",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gemini-Prompt erstellen": {
-      "main": [
-        [
-          {
-            "node": "Gemini-Ticket analysieren",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gemini-Ticket analysieren": {
-      "main": [
-        [
-          {
-            "node": "Gemini-Antwort validieren",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fehlerbenachrichtigung senden",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gemini-Antwort validieren": {
-      "main": [
-        [
-          {
-            "node": "Ticket in Firebase erstellen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fehlerbenachrichtigung senden",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ticket in Firebase erstellen": {
-      "main": [
-        [
-          {
-            "node": "Tageszähler erhöhen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fehlerbenachrichtigung senden",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Tageszähler erhöhen": {
+    "HTTP Request2": {
       "main": [
         [
           {
             "node": "Erfolg bestätigen",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fehlerbenachrichtigung senden",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Fehlerbenachrichtigung senden": {
-      "main": [
-        [
-          {
-            "node": "Fehler intern melden",
             "type": "main",
             "index": 0
           }
