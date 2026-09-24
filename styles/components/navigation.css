@@ -89,6 +89,32 @@
    color: #fff;
 }
 
+.navBar__list--public {
+   width: 100%;
+}
+
+.navBar__list--public li {
+   width: 100%;
+}
+
+.navBar__public-link {
+   width: 100%;
+   min-height: 48px;
+   padding: 8px 32px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   color: #ffffff;
+   font-size: 16px;
+   white-space: nowrap;
+}
+
+.navBar__public-link:hover,
+.navBar__public-link:focus-visible {
+   color: #29abe2;
+   background: #2a3d59;
+}
+
 .navBar__legalInformation {
    color: #a8a8a8;
    width: 100%;

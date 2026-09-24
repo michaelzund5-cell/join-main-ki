@@ -62,7 +62,7 @@ a {
     }
 
     .textcontent {
-        padding: 0 16px calc(112px + env(safe-area-inset-bottom));
+        padding: 0 16px calc(144px + env(safe-area-inset-bottom));
         overflow-wrap: anywhere;
     }
 }

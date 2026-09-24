@@ -73,6 +73,42 @@
    }
 }
 
+@media (max-width: 1080px) {
+   .legal-page--public .navBar {
+      justify-content: center;
+   }
+
+   .legal-page--public .navBar__menu {
+      width: 100%;
+      padding: 0 8px;
+      overflow: hidden;
+   }
+
+   .legal-page--public .navBar__list--public {
+      width: min(100%, 560px);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+   }
+
+   .legal-page--public .navBar__list--public li {
+      min-width: 0;
+   }
+
+   .legal-page--public .navBar__public-link {
+      min-width: 0;
+      height: 80px;
+      padding: 8px 4px;
+      text-align: center;
+      white-space: normal;
+   }
+
+   .legal-page--public .main_flex-instructions {
+      padding-bottom: calc(112px + env(safe-area-inset-bottom));
+   }
+}
+
 @media (max-width: 820px) {
    .navBar__quicklink {
       width: 132px;

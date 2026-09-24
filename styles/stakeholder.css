@@ -11,6 +11,11 @@ body {
    margin: 0;
 }
 
+html.stakeholder-choice-root {
+   min-height: 100%;
+   background: #2a3647;
+}
+
 /* =====================================================
    ALLGEMEINE STAKEHOLDER-SEITE
    ===================================================== */
@@ -312,6 +317,7 @@ body.stakeholder-page--choice {
    min-width: 0;
    min-height: 100vh;
    min-height: 100dvh;
+   min-height: 100svh;
 
    margin: 0;
    padding: 0;
@@ -332,6 +338,7 @@ body.stakeholder-page--choice {
    width: 100%;
    min-height: calc(100vh - 72px);
    min-height: calc(100dvh - 72px);
+   min-height: calc(100svh - 72px);
    height: auto;
    padding: 32px 32px 20px;
 

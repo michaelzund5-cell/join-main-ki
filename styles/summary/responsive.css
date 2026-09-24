@@ -65,12 +65,10 @@
 
 @media (max-width: 620px) {
    .main_flex-instructions {
-      height: calc(100dvh - 80px);
-      padding-bottom: 104px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-      overscroll-behavior-y: contain;
+      height: auto;
+      min-height: calc(100dvh - 80px);
+      padding-bottom: calc(128px + env(safe-area-inset-bottom));
+      overflow: visible;
    }
 
    .headline {

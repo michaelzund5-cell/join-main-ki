@@ -28,13 +28,29 @@ function transformNavbarForLogin() {
     const from = urlParams.get("from");
     const isPublicEntry = from === "welcome" || from === "stakeholder";
     if (from === "login" || from === "signup" || isPublicEntry) {
-        const isFromSignup = from === "signup";
-        const previousPage = getLegalPreviousPage(from, isFromSignup);
-        const buttonText = isPublicEntry ? "Welcome" : isFromSignup ? "Sign up" : "Log in";
-        replaceNavMenuWithBackButton(buttonText, previousPage);
+        renderPublicLegalNavigation();
         hideHeaderElements();
         centerHeaderContent();
+        document.body.classList.add("legal-page--public");
     }
+}
+
+/**
+ * Renders the public navigation used on legal pages.
+ * @returns {void} Nothing.
+ */
+function renderPublicLegalNavigation() {
+    const navMenu = document.querySelector(".navBar__menu");
+    if (!navMenu) return;
+
+    const isPrivacy = window.location.pathname.toLowerCase().includes("privacy-policy");
+    const isLegal = window.location.pathname.toLowerCase().includes("legalnotice");
+    navMenu.innerHTML = `
+        <ul class="navBar__list navBar__list--public list">
+            <li><a class="navBar__public-link" href="./login.html">Log In</a></li>
+            <li><a class="navBar__public-link${isPrivacy ? " navBar__quicklink--active" : ""}" href="./privacy-Policy.html?from=login">Privacy Policy</a></li>
+            <li><a class="navBar__public-link${isLegal ? " navBar__quicklink--active" : ""}" href="./legalnotice.html?from=login">Legal Notice</a></li>
+        </ul>`;
 }
 
 /**
