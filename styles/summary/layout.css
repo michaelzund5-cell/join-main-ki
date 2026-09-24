@@ -138,12 +138,18 @@
    min-height: 168px;
    display: grid;
    grid-template-columns: 560px 168px;
-   gap: 28px;
+   gap: 0;
+   border-radius: 30px;
+   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.1));
+   background-color: #ffffff;
+   overflow: hidden;
 }
 
 .summary__middle .summary__urgent {
    width: 560px;
    height: 168px;
+   border-radius: 0;
+   filter: none;
 }
 
 .urgent__priority {
@@ -220,6 +226,9 @@
    align-items: center;
    flex-direction: column;
    gap: 13px;
+   border-left: 1px solid #d1d1d1;
+   border-radius: 0;
+   filter: none;
 }
 
 .summary__number--email {

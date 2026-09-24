@@ -51,7 +51,7 @@
    <link rel="stylesheet" href="../styles/board/layout.css" />
    <link rel="stylesheet" href="../styles/board/controls.css" />
    <link rel="stylesheet" href="../styles/board/cards.css" />
-   <link rel="stylesheet" href="../styles/board/task-detail.css?v=20260923" />
+   <link rel="stylesheet" href="../styles/board/task-detail.css?v=20260924b" />
    <link rel="stylesheet" href="../styles/board/responsive.css?v=20260922" />
    <link rel="stylesheet" href="../styles/add-task/board-dialog.css" />
 </head>
@@ -520,7 +520,10 @@
                      <span id="taskDetailCreatorTypeText">Internal</span>
                   </span>
                   <span id="taskDetailCreatorName" class="task-detail__creator-name"></span>
-                  <a id="taskDetailCreatorEmail" class="task-detail__creator-email" href="#">Team member</a>
+                  <span class="task-detail__creator-email-row">
+                     <img class="task-detail__creator-email-icon" src="../assets/icons/desktop/mail.svg" alt="" />
+                     <a id="taskDetailCreatorEmail" class="task-detail__creator-email" href="#">Team member</a>
+                  </span>
                </div>
 
                <div class="task-detail__field">

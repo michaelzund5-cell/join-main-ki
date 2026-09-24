@@ -24,7 +24,7 @@
    .summary__middle {
       width: 560px;
       grid-template-columns: minmax(0, 1fr) 168px;
-      gap: 24px;
+      gap: 0;
    }
 
    .summary__middle .summary__urgent {
@@ -131,12 +131,12 @@
    .summary__middle {
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+      grid-template-columns: minmax(0, 1fr) 120px;
+      gap: 0;
    }
 
    .summary__middle .summary__urgent {
-      grid-column: 1 / -1;
+      grid-column: 1;
       width: 100%;
       height: auto;
       min-height: 120px;
@@ -155,11 +155,11 @@
       height: auto;
       min-height: 120px;
       padding: 20px 12px;
-      grid-column: 1 / -1;
+      grid-column: 2;
    }
 
    .summary__urgent {
-      gap: 40px;
+      gap: clamp(10px, 4vw, 28px);
    }
 
    .urgent__dividingLine {
@@ -216,6 +216,32 @@
 
    .summary__urgent {
       gap: 8px;
+   }
+
+   .summary__middle {
+      grid-template-columns: minmax(0, 1fr) 96px;
+   }
+
+   .summary__email-requests {
+      padding: 12px 6px;
+   }
+
+   .summary__email-requests .summary__text {
+      font-size: 14px;
+   }
+
+   .summary__middle .summary__number {
+      font-size: 36px;
+   }
+
+   .urgent__date {
+      gap: 6px;
+   }
+
+   .date__number,
+   .date__deadline,
+   .priority__text {
+      font-size: 13px;
    }
 
    .urgent__dividingLine {

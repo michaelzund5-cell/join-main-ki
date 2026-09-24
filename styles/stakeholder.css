@@ -500,7 +500,31 @@ body.stakeholder-page--choice {
    }
 
    .stakeholder-copy {
-      align-items: stretch;
+      display: contents;
+   }
+
+   .stakeholder-copy h2 {
+      grid-row: 1;
+   }
+
+   .stakeholder-illustration {
+      grid-row: 2;
+   }
+
+   .stakeholder-copy p {
+      max-width: none;
+   }
+
+   .stakeholder-copy p:first-of-type {
+      grid-row: 3;
+   }
+
+   .stakeholder-copy p:nth-of-type(2) {
+      grid-row: 4;
+   }
+
+   .stakeholder-copy .stakeholder-button {
+      grid-row: 5;
    }
 
    .stakeholder-button {
@@ -508,7 +532,6 @@ body.stakeholder-page--choice {
    }
 
    .stakeholder-illustration {
-      grid-row: auto;
       justify-self: center;
    }
 
