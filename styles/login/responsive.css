@@ -59,8 +59,7 @@
     }
 
     .login__signup {
-        position: absolute;
-        bottom: 20px;
+        position: static;
         width: 100%;
         padding: 0 16px;
         justify-content: center;
@@ -177,6 +176,10 @@
         min-height: 100svh;
         display: grid;
         grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+
+    .header__flex-instructions {
+        min-height: 72px;
     }
 
     .main-content main,
