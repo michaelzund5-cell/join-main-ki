@@ -132,7 +132,9 @@
 }
 
 .task-detail__creator {
-   flex-wrap: wrap;
+   display: grid;
+   grid-template-columns: auto auto auto minmax(0, 1fr);
+   align-items: center;
    gap: 10px;
 }
 
@@ -146,10 +148,23 @@
    color: #2a3647;
    font-size: 16px;
    line-height: 1.2;
+   gap: 5px;
 }
 
 .task-detail__creator-badge--external {
    background: #e8ff74;
+}
+
+.task-detail__creator-icon {
+   width: 18px;
+   height: 18px;
+   flex: 0 0 18px;
+}
+
+.task-detail__creator-name {
+   color: #2a3647;
+   font-size: 18px;
+   min-width: 0;
 }
 
 .task-detail__creator-email {
@@ -157,6 +172,7 @@
    font-size: 18px;
    overflow-wrap: anywhere;
    text-decoration: none;
+   min-width: 0;
 }
 
 .task-detail__creator-email[href^="mailto:"]:hover {
@@ -312,7 +328,13 @@ dialog::backdrop {
    }
 
    .task-detail__topline {
+      flex-wrap: wrap;
       gap: 8px;
+   }
+
+   .task-detail__ai-badge {
+      width: 100%;
+      flex: 1 0 100%;
    }
 
    .task-detail__label {
@@ -349,5 +371,14 @@ dialog::backdrop {
    .task-detail__priority,
    .task-detail__group-title {
       font-size: 18px;
+   }
+
+   .task-detail__creator {
+      grid-template-columns: auto minmax(0, 1fr);
+   }
+
+   .task-detail__creator-name,
+   .task-detail__creator-email {
+      grid-column: 1 / -1;
    }
 }

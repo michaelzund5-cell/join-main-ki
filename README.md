@@ -14,6 +14,8 @@ Kanban, a Japanese term meaning "billboard", is a highly effective method to vis
 
 Open the project URL to start on the **Welcome** page. Stakeholders choose **Create request** and open a prepared email to `diepausenclowns@gmail.com`; team members choose **Member log in**. AI processing runs invisibly in n8n, and generated tasks are created in the **Triage** board column. See `docs/n8n-integration.md` for the data contract.
 
+The importable workflow is stored at `n8n-workflows/email-issue-collector.json`. Import it in n8n, reconnect the Gmail credential, add the Gemini API key to the Gemini HTTP node and publish the workflow. Credentials and secrets are deliberately not committed.
+
 Here is a step-by-step guide on how to use **Join**:
 
 ### 1️⃣ Exploring the Board

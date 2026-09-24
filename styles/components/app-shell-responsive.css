@@ -1,4 +1,10 @@
 @media (max-width: 1080px) {
+   html,
+   body {
+      min-width: 0;
+      overflow-x: hidden;
+   }
+
    .header {
       height: 80px;
    }
@@ -40,6 +46,7 @@
    .logo__dark {
       width: 32px;
       display: flex;
+      flex: 0 0 auto;
    }
 
    .navBar__legalInformation {
@@ -48,6 +55,7 @@
 
    .navBar__menu {
       padding: 0 20px;
+      overflow-x: auto;
    }
 
    .navBar__list {
@@ -78,6 +86,7 @@
 @media (max-width: 620px) {
    .topBar {
       padding: 20px 16px;
+      justify-content: space-between;
    }
 
    .help__icon {
@@ -90,6 +99,12 @@
 
    .header__dropdown {
       right: 16px;
+   }
+
+   .login__initials {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
    }
 
    .quicklink__icon {

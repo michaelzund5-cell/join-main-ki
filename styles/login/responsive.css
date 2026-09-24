@@ -73,15 +73,20 @@
 }
 
 @media (max-width: 600px) {
+    body {
+        min-width: 0;
+        min-height: 100svh;
+        overflow-x: hidden;
+    }
+
     .login__signup {
-        position: absolute;
-        bottom: 20px;
+        position: static;
         width: 100%;
-        padding: 80px 0;
+        padding: 16px 16px 0;
         display: flex;
         justify-content: center;
         align-items: flex-end;
-        gap: 35px;
+        gap: 16px;
     }
 
     .login__signup--question {
@@ -116,13 +121,13 @@
 
     .login__window {
         width: calc(100% - 32px);
-        padding: 48px 16px;
-        gap: 28px;
+        padding: 28px 20px;
+        gap: 18px;
     }
 
     .login__formular {
         width: 100%;
-        gap: 32px;
+        gap: 20px;
     }
 
     .login__input-field,
@@ -131,7 +136,7 @@
     }
 
     .login__buttonArea {
-        width: 70%;
+        width: min(100%, 240px);
         flex-direction: column;
     }
 
@@ -140,7 +145,9 @@
     }
 
     .login__legalInformation--area {
-        bottom: 32px;
+        position: static;
+        padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
+        flex-wrap: wrap;
     }
 
     .signup-success-message {
@@ -168,15 +175,16 @@
     .main-content,
     .main-content--signup {
         min-height: 100svh;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
     }
 
     .main-content main,
     .main-content--signup main {
-        height: auto;
-        min-height: 100svh;
-        align-items: flex-start;
-        padding-top: 120px;
-        padding-bottom: 120px;
+      height: auto;
+      min-height: 0;
+      align-items: center;
+      padding: 84px 0 20px;
     }
 
     .main-content--signup-logo {
@@ -188,5 +196,19 @@
 
     .login__window {
         margin-top: 0;
+        max-width: 520px;
+    }
+}
+
+@media (max-width: 600px) and (max-height: 700px) {
+    .main-content main,
+    .main-content--signup main {
+        align-items: flex-start;
+        padding-top: 88px;
+    }
+
+    .login__window {
+        padding-top: 32px;
+        padding-bottom: 32px;
     }
 }

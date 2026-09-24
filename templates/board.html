@@ -21,7 +21,7 @@
    <script src="../scripts/board/board-cards-render.js"></script>
    <script src="../scripts/board/board-dragdrop.js"></script>
    <script src="../scripts/board/board-task-detail-form.js"></script>
-   <script src="../scripts/board/board-task-detail-render.js?v=20260920b"></script>
+   <script src="../scripts/board/board-task-detail-render.js?v=20260923"></script>
    <script src="../scripts/board/board-task-detail.js"></script>
    <script src="../scripts/board/board.js"></script>
    <script src="../scripts/tasks/add-task-validation.js"></script>
@@ -42,7 +42,7 @@
    <link rel="stylesheet" href="../styles/components/header.css" />
    <link rel="stylesheet" href="../styles/components/dropdown.css" />
    <link rel="stylesheet" href="../styles/components/app-shell.css" />
-   <link rel="stylesheet" href="../styles/components/app-shell-responsive.css" />
+   <link rel="stylesheet" href="../styles/components/app-shell-responsive.css?v=20260922" />
    <link rel="stylesheet" href="../styles/components/buttons.css" />
    <link rel="stylesheet" href="../styles/add-task/layout.css" />
    <link rel="stylesheet" href="../styles/add-task/controls.css" />
@@ -51,8 +51,8 @@
    <link rel="stylesheet" href="../styles/board/layout.css" />
    <link rel="stylesheet" href="../styles/board/controls.css" />
    <link rel="stylesheet" href="../styles/board/cards.css" />
-   <link rel="stylesheet" href="../styles/board/task-detail.css?v=20260920b" />
-   <link rel="stylesheet" href="../styles/board/responsive.css" />
+   <link rel="stylesheet" href="../styles/board/task-detail.css?v=20260923" />
+   <link rel="stylesheet" href="../styles/board/responsive.css?v=20260922" />
    <link rel="stylesheet" href="../styles/add-task/board-dialog.css" />
 </head>
 
@@ -515,7 +515,11 @@
 
                <div class="task-detail__field task-detail__creator">
                   <span class="task-detail__field-label">Creator:</span>
-                  <span id="taskDetailCreatorType" class="task-detail__creator-badge">Internal</span>
+                  <span id="taskDetailCreatorType" class="task-detail__creator-badge">
+                     <img id="taskDetailCreatorIcon" class="task-detail__creator-icon" src="../assets/icons/desktop/external-globe.svg" alt="" />
+                     <span id="taskDetailCreatorTypeText">Internal</span>
+                  </span>
+                  <span id="taskDetailCreatorName" class="task-detail__creator-name"></span>
                   <a id="taskDetailCreatorEmail" class="task-detail__creator-email" href="#">Team member</a>
                </div>
 

@@ -62,16 +62,28 @@
    /** Renders the internal or external ticket creator. */
    function setTaskDetailCreator(taskData) {
       const typeElement = document.getElementById("taskDetailCreatorType");
+      const typeTextElement = document.getElementById("taskDetailCreatorTypeText");
+      const iconElement = document.getElementById("taskDetailCreatorIcon");
+      const nameElement = document.getElementById("taskDetailCreatorName");
       const emailElement = document.getElementById("taskDetailCreatorEmail");
-      if (!typeElement || !emailElement) return;
+      if (!typeElement || !typeTextElement || !nameElement || !emailElement) return;
       const creator = taskData.creator && typeof taskData.creator === "object" ? taskData.creator : {};
       const isExternal = creator.type === "external" || taskData.source === "email";
-      const creatorText = String(creator.email || creator.name || "").trim();
+      const creatorText = String(creator.raw || creator.email || creator.name || "").trim();
       const emailMatch = creatorText.match(/<([^<>@]+@[^<>]+)>/) || creatorText.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/);
       const email = emailMatch ? (emailMatch[1] || emailMatch[0]) : "";
-      typeElement.textContent = isExternal ? "🌐 External" : "Internal";
+      const inferredName = creatorText
+         .replace(/<[^<>]+>/g, "")
+         .replace(email, "")
+         .replace(/^["']|["']$/g, "")
+         .trim();
+      const name = String(creator.name || inferredName || "").trim();
+      typeTextElement.textContent = isExternal ? "External" : "Internal";
       typeElement.classList.toggle("task-detail__creator-badge--external", isExternal);
-      emailElement.textContent = creatorText || (isExternal ? "External stakeholder" : "Team member");
+      if (iconElement) iconElement.hidden = !isExternal;
+      nameElement.textContent = name;
+      nameElement.hidden = !name;
+      emailElement.textContent = email || creatorText || (isExternal ? "External stakeholder" : "Team member");
       emailElement.href = email ? `mailto:${email}` : "#";
       emailElement.toggleAttribute("aria-disabled", !email);
    }
@@ -133,7 +145,8 @@
     * @returns {string} The task detail subtask text.
     */
    function getTaskDetailSubtaskText(subtask, index) {
-      return subtask.text || `Subtask ${index + 1}`;
+      if (typeof subtask === "string") return subtask;
+      return subtask.title || subtask.text || subtask.name || `Subtask ${index + 1}`;
    }
 
    /**
@@ -184,7 +197,8 @@
     * @returns {void} Nothing.
     */
    function renderTaskDetailSubtasks(subtasks) {
-      renderTaskDetailList("taskDetailSubtasksList", subtasks, "No subtasks", createTaskDetailSubtaskItem);
+      const normalizedSubtasks = Array.isArray(subtasks) ? subtasks : [];
+      renderTaskDetailList("taskDetailSubtasksList", normalizedSubtasks, "No subtasks", createTaskDetailSubtaskItem);
    }
 
    /**

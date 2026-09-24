@@ -50,17 +50,19 @@ a {
     }
 
     .textcontent {
-        padding: 0 40px 104px;
+        padding: 0 40px calc(120px + env(safe-area-inset-bottom));
     }
 }
 
 @media (max-width: 620px) {
     .headline__legalinformation {
-        font-size: 47px;
-        padding: 144px 16px 48px;
+        font-size: clamp(36px, 12vw, 47px);
+        padding: 118px 16px 32px;
+        overflow-wrap: anywhere;
     }
 
     .textcontent {
-        padding: 0 16px 104px;
+        padding: 0 16px calc(112px + env(safe-area-inset-bottom));
+        overflow-wrap: anywhere;
     }
 }

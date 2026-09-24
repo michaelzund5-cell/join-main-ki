@@ -36,11 +36,12 @@ async function loadRequestCount() {
    }
 }
 
-/** Creates the mailto address used for both request states. */
-function buildRequestMailto() {
+/** Creates one identical Gmail compose URL for desktop and mobile layouts. */
+function buildRequestEmailUrl() {
    const subject = encodeURIComponent("Join feature request");
    const body = encodeURIComponent("Describe your request:\n\nSubtasks (optional):\n- \n- \n\nDeadline (optional):");
-   return `mailto:${REQUEST_EMAIL}?subject=${subject}&body=${body}`;
+   const recipient = encodeURIComponent(REQUEST_EMAIL);
+   return `https://mail.google.com/mail/?view=cm&fs=1&to=${recipient}&su=${subject}&body=${body}`;
 }
 
 /** Renders the available or reached-limit state. */
@@ -60,9 +61,9 @@ function renderRequestState(count) {
 
 /** Initializes request links and the daily usage state. */
 async function initializeStakeholderPage() {
-   const mailto = buildRequestMailto();
-   document.getElementById("createEmailRequest")?.setAttribute("href", mailto);
-   document.getElementById("sendManualEmail")?.setAttribute("href", mailto);
+   const emailUrl = buildRequestEmailUrl();
+   document.getElementById("createEmailRequest")?.setAttribute("href", emailUrl);
+   document.getElementById("sendManualEmail")?.setAttribute("href", emailUrl);
    renderRequestState(await loadRequestCount());
 }
 
