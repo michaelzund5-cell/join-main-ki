@@ -23,6 +23,46 @@
    .task-card__progress-text {
       overflow-wrap: anywhere;
    }
+
+   /* Switch to the Figma tablet layout before five columns become too narrow. */
+   .board-task-grid {
+      max-height: none;
+      padding-bottom: 160px;
+      flex-direction: column;
+      gap: 32px;
+      overflow-x: hidden;
+      overflow-y: visible;
+   }
+
+   .board-task-column {
+      width: 100%;
+      flex: 0 0 auto;
+   }
+
+   .board-task-directory {
+      min-width: 0;
+      flex-direction: row;
+      align-items: flex-start;
+   }
+
+   .board-task-directory-scroll {
+      width: 100%;
+      min-width: 0;
+      padding: 10px 8px;
+      box-sizing: border-box;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scrollbar-width: thin;
+      scrollbar-color: #a8a8a8 transparent;
+   }
+
+   .task-card,
+   .board-task-placeholder {
+      width: 252px;
+      min-width: 252px;
+      flex: 0 0 252px;
+   }
 }
 
 @media (max-width: 1080px) {

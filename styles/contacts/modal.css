@@ -40,6 +40,13 @@
    align-items: center;
    z-index: 30;
    background: rgba(0, 0, 0, 0.5);
+   padding: 16px;
+   overflow: hidden;
+}
+
+html.contact-dialog-open,
+body.contact-dialog-open {
+   overflow: hidden;
 }
 
 .overlay-content {
@@ -49,7 +56,10 @@
    display: flex;
    border-radius: 30px;
    background: white;
-   overflow: hidden;
+   max-height: calc(100dvh - 32px);
+   overflow-x: hidden;
+   overflow-y: auto;
+   overscroll-behavior: contain;
 }
 
 .contact-modal__brand {

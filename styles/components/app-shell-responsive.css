@@ -24,6 +24,16 @@
 
    .main {
       margin-left: 0;
+      min-width: 0;
+      padding-bottom: calc(80px + env(safe-area-inset-bottom));
+   }
+
+   .mainArea,
+   .main_flex-instructions {
+      min-width: 0;
+      height: auto;
+      min-height: 100dvh;
+      overflow-x: hidden;
    }
 
    .navBar {
@@ -33,6 +43,7 @@
       padding-bottom: 0;
       justify-content: space-between;
       flex-direction: row;
+      padding-bottom: env(safe-area-inset-bottom);
    }
 
    .navBar__logo {

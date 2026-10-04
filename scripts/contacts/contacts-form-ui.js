@@ -313,6 +313,8 @@
     */
    function showOverlay() {
       document.getElementById("overlay")?.classList.remove("d-none");
+      document.documentElement.classList.add("contact-dialog-open");
+      document.body.classList.add("contact-dialog-open");
       bindErrorHideOnInput();
    }
 
@@ -322,6 +324,8 @@
     */
    function hideOverlay() {
       document.getElementById("overlay")?.classList.add("d-none");
+      document.documentElement.classList.remove("contact-dialog-open");
+      document.body.classList.remove("contact-dialog-open");
    }
 
    /**

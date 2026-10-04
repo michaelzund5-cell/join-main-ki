@@ -26,9 +26,11 @@
 
    .overlay-content {
       width: min(680px, calc(100vw - 32px));
-      height: min(90vh, 760px);
-      min-height: 620px;
+      height: auto;
+      max-height: calc(100dvh - 32px);
+      min-height: 0;
       flex-direction: column;
+      overflow-y: auto;
    }
 
    .contact-modal__logo {
@@ -85,8 +87,12 @@
    }
 
    .contact-modal__close {
-      top: 24px;
+      position: sticky;
+      top: 16px;
       right: 16px;
+      margin-left: auto;
+      margin-bottom: -48px;
+      flex: 0 0 auto;
    }
 
    .contact-modal__brand h2 {
@@ -192,13 +198,18 @@
 }
 
 @media (max-width: 620px) {
+   .overlay {
+      padding: 0;
+   }
+
    .overlay-content {
       width: 100vw;
-      height: 100vh;
-      min-height: 100vh;
+      height: 100dvh;
+      min-height: 0;
       max-width: none;
-      max-height: none;
+      max-height: 100dvh;
       border-radius: 0;
+      overflow-y: auto;
    }
 }
 
