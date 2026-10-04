@@ -83,7 +83,7 @@
          medium: boardCardsAssetPath("icons/desktop/Priority gleich.svg"),
          low: boardCardsAssetPath("icons/desktop/Priority green.svg"),
       };
-      return icons[priority] || icons.medium;
+      return icons[String(priority || "").trim().toLowerCase()] || icons.medium;
    }
 
    /**
@@ -94,7 +94,7 @@
     */
    function getPriorityLabel(priority) {
       const labels = { urgent: "Urgent", medium: "Medium", low: "Low" };
-      return labels[String(priority || "")] || "Medium";
+      return labels[String(priority || "").trim().toLowerCase()] || "Medium";
    }
 
    /**
@@ -104,8 +104,16 @@
     * @returns {string} The category label.
     */
    function getCategoryLabel(category) {
-      const categoryStr = String(category || "");
-      const labels = { technical: "Technical Task", "user-story": "User Story" };
+      const categoryStr = String(category || "").trim().toLowerCase();
+      const labels = {
+         technical: "Technical Task",
+         "technical task": "Technical Task",
+         "tech task": "Technical Task",
+         "user-story": "User Story",
+         "user story": "User Story",
+         feature: "User Story",
+         bug: "Bug",
+      };
       return labels[categoryStr] || categoryStr;
    }
 
@@ -218,8 +226,9 @@
     * @returns {object} The task card render data object.
     */
    function getTaskCardRenderData(taskData) {
+      const normalizedCategory = String(taskData.category || "").trim().toLowerCase();
       return {
-         categoryClass: taskData.category === "technical" ? "task-card__label--teal" : "",
+         categoryClass: normalizedCategory === "technical" || normalizedCategory === "technical task" || normalizedCategory === "tech task" ? "task-card__label--teal" : "",
          categoryLabel: getCategoryLabel(taskData.category),
          priorityIconSrc: getPriorityIcon(taskData.priority),
          avatarsHTML: buildAvatarsHTML(taskData),

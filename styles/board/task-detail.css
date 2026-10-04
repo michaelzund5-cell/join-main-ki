@@ -140,9 +140,10 @@
 
 .task-detail__creator {
    display: grid;
-   grid-template-columns: auto auto minmax(0, max-content) minmax(0, 1fr);
-   align-items: center;
-   gap: 10px;
+   grid-template-columns: max-content minmax(0, 1fr);
+   align-items: start;
+   column-gap: 12px;
+   row-gap: 7px;
 }
 
 .task-detail__creator-badge {
@@ -172,12 +173,14 @@
 }
 
 .task-detail__creator-name {
+   grid-column: 2;
    color: #2a3647;
    font-size: 18px;
    min-width: 0;
 }
 
 .task-detail__creator-email-row {
+   grid-column: 2;
    display: flex;
    align-items: center;
    min-width: 0;
@@ -192,7 +195,7 @@
 
 .task-detail__creator-email {
    color: #2a3647;
-   font-size: 18px;
+   font-size: 16px;
    overflow-wrap: anywhere;
    text-decoration: none;
    min-width: 0;
@@ -338,12 +341,14 @@ dialog::backdrop {
 @media (max-width: 620px) {
    .task-detail-dialog {
       width: calc(100% - 24px);
-      max-height: calc(100svh - 112px);
-      margin: auto;
+      height: calc(100dvh - 24px);
+      max-height: calc(100dvh - 24px);
+      margin: 12px auto;
    }
 
    .task-detail {
-      max-height: calc(100svh - 112px);
+      height: 100%;
+      max-height: 100%;
       min-height: 0;
    }
 
@@ -353,24 +358,25 @@ dialog::backdrop {
    }
 
    .task-detail__topline {
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 8px;
    }
 
    .task-detail__ai-badge {
-      width: 100%;
-      flex: 1 0 100%;
+      width: auto;
+      min-width: 0;
+      flex: 0 1 auto;
    }
 
    .task-detail__label {
       padding: 4px 10px;
-      font-size: 14px;
+      font-size: 13px;
    }
 
    .task-detail__ai-badge {
       gap: 4px;
-      font-size: 13px;
-      white-space: normal;
+      font-size: 12px;
+      white-space: nowrap;
    }
 
    .task-detail__ai-badge img {
@@ -379,8 +385,12 @@ dialog::backdrop {
    }
 
    .task-detail__content {
+      flex: 1;
+      min-height: 0;
       gap: 14px;
       padding: 10px 18px 16px;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
    }
 
    .task-detail__footer {
@@ -401,12 +411,7 @@ dialog::backdrop {
    }
 
    .task-detail__creator {
-      grid-template-columns: auto minmax(0, 1fr);
-   }
-
-   .task-detail__creator-name,
-   .task-detail__creator-email-row {
-      grid-column: 1 / -1;
+      grid-template-columns: max-content minmax(0, 1fr);
    }
 }
 
@@ -414,12 +419,14 @@ dialog::backdrop {
    .task-detail-dialog {
       width: calc(100% - 16px);
       max-width: calc(100% - 16px);
-      max-height: calc(100dvh - 96px);
+      height: calc(100dvh - 16px);
+      max-height: calc(100dvh - 16px);
+      margin: 8px auto;
       border-radius: 20px;
    }
 
    .task-detail {
-      max-height: calc(100dvh - 96px);
+      max-height: 100%;
    }
 
    .task-detail__header {

@@ -16,6 +16,33 @@
    }
 
    /**
+    * Normalizes priority values from manually and AI-created tasks.
+    *
+    * @param {*} priority - The stored priority value.
+    * @returns {string} The priority value used by the form.
+    */
+   function normalizePriorityForForm(priority) {
+      const normalized = String(priority || "").trim().toLowerCase();
+      if (normalized === "urgent" || normalized === "high") return "urgent";
+      if (normalized === "low") return "low";
+      return "medium";
+   }
+
+   /**
+    * Normalizes category values from manually and AI-created tasks.
+    *
+    * @param {*} category - The stored category value.
+    * @returns {string} The category value used by the form.
+    */
+   function normalizeCategoryForForm(category) {
+      const normalized = String(category || "").trim().toLowerCase();
+      if (normalized === "technical" || normalized === "technical task" || normalized === "tech task") return "technical";
+      if (normalized === "user-story" || normalized === "user story" || normalized === "feature") return "user-story";
+      if (normalized === "bug") return "bug";
+      return "";
+   }
+
+   /**
     * Sets the priority in form.
     *
     * @param {string} priority - The priority.
@@ -25,7 +52,7 @@
       const priorityField = document.getElementById("addTaskPriority");
       if (!priorityField) return;
       clearPriorityButtons(priorityField);
-      getPriorityButton(priorityField, priority)?.classList.add("add-task__priority-option--active");
+      getPriorityButton(priorityField, normalizePriorityForForm(priority))?.classList.add("add-task__priority-option--active");
    }
 
    /**
@@ -93,8 +120,9 @@
       const input = document.getElementById("addTaskCategoryInput");
       const label = document.querySelector("#addTaskCategory .add-task__select-value");
       if (!input) return;
-      input.value = category || "";
-      setCategoryLabel(label, getCategoryOption(category));
+      const normalizedCategory = normalizeCategoryForForm(category);
+      input.value = normalizedCategory;
+      setCategoryLabel(label, getCategoryOption(normalizedCategory));
       syncCategoryInputState(input);
    }
 
@@ -212,8 +240,9 @@
     */
    function createEditableSubtaskItem(subtask) {
       if (typeof createSubtaskItem !== "function") return null;
-      const item = createSubtaskItem(subtask.text || "");
-      item.dataset.completed = subtask.completed ? "true" : "false";
+      const normalizedSubtask = typeof subtask === "string" ? { text: subtask } : (subtask || {});
+      const item = createSubtaskItem(normalizedSubtask.text || normalizedSubtask.title || normalizedSubtask.name || "");
+      item.dataset.completed = normalizedSubtask.completed ? "true" : "false";
       return item;
    }
 
@@ -267,7 +296,7 @@
    function fillAddTaskFormForEdit(taskData) {
       setFormFieldValueAndTrigger("addTaskTitle", taskData.title);
       setFormFieldValueAndTrigger("addTaskDescription", taskData.description);
-      setFormFieldValueAndTrigger("addTaskDate", taskData.date);
+      setFormFieldValueAndTrigger("addTaskDate", taskData.date || taskData.deadline);
       setPriorityInForm(taskData.priority || "medium");
       setCategoryInForm(taskData.category || "");
       setAssignedInForm(taskData.assigned || []);

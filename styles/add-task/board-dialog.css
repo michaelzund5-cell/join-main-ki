@@ -103,19 +103,43 @@
 
 @media (max-width: 620px) {
    .addtaskDialog {
-      width: 100vw;
-      height: 100vh;
+      width: calc(100vw - 16px);
+      height: calc(100dvh - 16px);
       max-width: none;
-      max-height: none;
-      border-radius: 0;
+      max-height: calc(100dvh - 16px);
+      margin: 8px auto;
+      border-radius: 20px;
+      overflow: hidden;
+   }
+
+   .addtaskDialog .dialog_flex-instructions {
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
    }
 
    .addtaskDialog .headline__board {
-      padding: 24px 16px 12px;
+      position: static;
+      flex: 0 0 auto;
+      padding: 20px 16px 12px;
    }
 
    .addtaskDialog .add-task__form-information {
-      padding: 108px 16px 12px;
+      flex: 1;
+      min-height: 0;
+      padding: 0 16px 12px;
+      overflow: hidden;
+   }
+
+   .addtaskDialog .add-task__overview {
+      flex: 1;
+      height: auto;
+      min-height: 0;
+      padding: 0 2px 16px 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
    }
 
    .addtaskDialog .add-task__subtask-list {
@@ -123,6 +147,37 @@
    }
 
    .addtaskDialog .add-task__footer {
+      flex: 0 0 auto;
+      margin-top: 0;
       padding: 12px 0 16px;
+   }
+}
+
+@media (max-width: 360px) {
+   .addtaskDialog .headline__board {
+      padding: 16px 12px 10px;
+   }
+
+   .addtaskDialog .headline__name {
+      font-size: 36px;
+   }
+
+   .addtaskDialog .add-task__form-information {
+      padding: 0 12px 10px;
+   }
+
+   .addtaskDialog .add-task__priority-field {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+   }
+
+   .addtaskDialog .add-task__priority-option {
+      min-width: 0;
+      padding-inline: 6px;
+   }
+
+   .addtaskDialog .add-task__priority-label {
+      font-size: 14px;
    }
 }
