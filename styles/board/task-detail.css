@@ -358,7 +358,7 @@ dialog::backdrop {
    }
 
    .task-detail__topline {
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: 8px;
    }
 
@@ -376,7 +376,9 @@ dialog::backdrop {
    .task-detail__ai-badge {
       gap: 4px;
       font-size: 12px;
-      white-space: nowrap;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
    }
 
    .task-detail__ai-badge img {
@@ -394,6 +396,7 @@ dialog::backdrop {
    }
 
    .task-detail__footer {
+      flex: 0 0 auto;
       padding: 14px 18px 18px;
       flex-wrap: wrap;
    }

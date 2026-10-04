@@ -1,11 +1,11 @@
 @media (max-width: 1160px) {
    .overview__summary {
       width: 560px;
-      gap: 24px;
+      gap: 20px;
    }
 
    .summary__todo {
-      gap: 24px;
+      gap: 20px;
    }
 
    .todo__card {
@@ -17,14 +17,14 @@
    }
 
    .summary__tasks {
-      width: 560px;
-      gap: 24px;
+      width: 100%;
+      gap: 20px;
    }
 
    .summary__middle {
-      width: 560px;
+      width: 100%;
       grid-template-columns: minmax(0, 1fr) 168px;
-      gap: 24px;
+      gap: 20px;
    }
 
    .summary__middle .summary__urgent {

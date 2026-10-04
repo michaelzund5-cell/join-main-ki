@@ -8,11 +8,11 @@
 }
 
 .overview__summary {
-   width: 756px;
+   width: 560px;
    min-height: 562px;
    display: flex;
    flex-direction: column;
-   gap: 28px;
+   gap: 20px;
 }
 
 .headline_summary {
@@ -110,10 +110,10 @@
 }
 
 .summary__todo {
-   width: 560px;
+   width: 100%;
    display: flex;
    flex: 1;
-   gap: 28px;
+   gap: 20px;
 }
 
 .todo__card {
@@ -134,11 +134,11 @@
 }
 
 .summary__middle {
-   width: 756px;
+   width: 100%;
    min-height: 168px;
    display: grid;
-   grid-template-columns: minmax(0, 560px) minmax(0, 168px);
-   gap: 28px;
+   grid-template-columns: minmax(0, 1fr) 168px;
+   gap: 20px;
 }
 
 .summary__middle .summary__urgent {
@@ -191,21 +191,21 @@
 }
 
 .summary__tasks {
-   width: 560px;
+   width: 100%;
    display: flex;
    flex-wrap: nowrap;
    flex: 1;
-   gap: 28px;
+   gap: 20px;
 }
 
 .tasks__card {
    text-align: center;
    justify-content: center;
    align-items: center;
-   width: 168px;
+   width: auto;
    height: 168px;
    padding: 25px;
-   flex: 0 0 168px;
+   flex: 1 1 0;
    flex-direction: column;
    min-width: 0;
    gap: 13px;

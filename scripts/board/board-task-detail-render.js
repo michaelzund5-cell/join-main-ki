@@ -83,8 +83,10 @@
       if (iconElement) iconElement.hidden = !isExternal;
       nameElement.textContent = name;
       nameElement.hidden = !name;
-      emailElement.textContent = email || creatorText || (isExternal ? "External stakeholder" : "Team member");
+      emailElement.textContent = email ? "E-Mail" : (creatorText || (isExternal ? "External stakeholder" : "Team member"));
       emailElement.href = email ? `mailto:${email}` : "#";
+      emailElement.title = email;
+      emailElement.setAttribute("aria-label", email ? `E-Mail an ${email} senden` : emailElement.textContent);
       emailElement.toggleAttribute("aria-disabled", !email);
    }
 
