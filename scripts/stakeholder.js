@@ -17,19 +17,59 @@ function getRequestDateKey() {
 /** Converts a Firebase counter value into a safe non-negative integer. */
 function normalizeRequestCount(value) {
    if (typeof value === "number") return Math.max(0, Math.floor(value));
-   if (value && typeof value === "object") return Object.keys(value).length;
+   if (typeof value === "string" && value.trim() !== "") {
+      const parsed = Number(value);
+      if (Number.isFinite(parsed)) return Math.max(0, Math.floor(parsed));
+   }
+   if (value && typeof value === "object") {
+      const parsed = Number(value.count ?? value.value);
+      if (Number.isFinite(parsed)) return Math.max(0, Math.floor(parsed));
+   }
    return 0;
+}
+
+/** Returns true when a timestamp belongs to today in Europe/Zurich. */
+function isTodayInZurich(value) {
+   const timestamp = Number(value);
+   if (!Number.isFinite(timestamp) || timestamp <= 0) return false;
+   return getRequestDateKey() === new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Zurich",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+   }).format(new Date(timestamp));
+}
+
+/** Derives today's request count from the actual email-created tasks. */
+async function loadTaskDerivedRequestCount() {
+   const response = await fetch(`${REQUEST_BASE_URL}tasks.json`, { cache: "no-store" });
+   if (!response.ok) throw new Error(`HTTP ${response.status}`);
+   const rawTasks = await response.json();
+   const tasks = rawTasks && typeof rawTasks === "object" ? Object.values(rawTasks) : [];
+   return tasks.filter((task) => {
+      if (!task || typeof task !== "object") return false;
+      const isEmailRequest = task.source === "email" || task.aiGenerated === true;
+      const createdAt = task.createdAt ?? task.id;
+      return isEmailRequest && isTodayInZurich(createdAt);
+   }).length;
 }
 
 /** Loads the request counter written by the n8n workflow. */
 async function loadRequestCount() {
    if (!REQUEST_BASE_URL) return 0;
    try {
-      const response = await fetch(`${REQUEST_BASE_URL}emailRequestUsage/${getRequestDateKey()}.json`, {
-         cache: "no-store",
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return normalizeRequestCount(await response.json());
+      const [counterResult, taskResult] = await Promise.allSettled([
+         fetch(`${REQUEST_BASE_URL}emailRequestUsage/${getRequestDateKey()}.json`, {
+            cache: "no-store",
+         }).then(async (response) => {
+            if (!response.ok) throw new Error(`Counter HTTP ${response.status}`);
+            return normalizeRequestCount(await response.json());
+         }),
+         loadTaskDerivedRequestCount(),
+      ]);
+      const storedCount = counterResult.status === "fulfilled" ? counterResult.value : 0;
+      const derivedCount = taskResult.status === "fulfilled" ? taskResult.value : 0;
+      return Math.max(storedCount, derivedCount);
    } catch (error) {
       console.warn("Daily request counter could not be loaded:", error);
       return 0;
