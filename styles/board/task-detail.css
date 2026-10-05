@@ -139,11 +139,10 @@
 }
 
 .task-detail__creator {
-   display: grid;
-   grid-template-columns: max-content minmax(0, 1fr);
-   align-items: start;
-   column-gap: 12px;
-   row-gap: 7px;
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   min-width: 0;
 }
 
 .task-detail__creator-badge {
@@ -172,15 +171,23 @@
    flex: 0 0 18px;
 }
 
+.task-detail__creator-details {
+   display: grid;
+   grid-template-columns: max-content minmax(0, 1fr) max-content;
+   align-items: center;
+   gap: 12px;
+   min-width: 0;
+   flex: 1 1 auto;
+}
+
 .task-detail__creator-name {
-   grid-column: 2;
    color: #2a3647;
    font-size: 18px;
    min-width: 0;
+   overflow-wrap: anywhere;
 }
 
 .task-detail__creator-email-row {
-   grid-column: 2;
    display: flex;
    align-items: center;
    min-width: 0;
@@ -414,7 +421,14 @@ dialog::backdrop {
    }
 
    .task-detail__creator {
-      grid-template-columns: max-content minmax(0, 1fr);
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+   }
+
+   .task-detail__creator-details {
+      width: 100%;
+      grid-template-columns: max-content minmax(0, 1fr) max-content;
    }
 }
 
@@ -448,6 +462,22 @@ dialog::backdrop {
    .task-detail__field {
       min-width: 0;
       gap: 12px;
+   }
+
+   .task-detail__creator-details {
+      gap: 8px;
+   }
+
+   .task-detail__creator-details .task-detail__field-label,
+   .task-detail__creator-name,
+   .task-detail__creator-email {
+      font-size: 15px;
+   }
+
+   .task-detail__creator-email-icon {
+      width: 16px;
+      height: 16px;
+      flex-basis: 16px;
    }
 
    .task-detail__footer {

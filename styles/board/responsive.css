@@ -138,16 +138,16 @@
 
 @media (max-width: 620px) {
    .headline_board {
-      padding: 118px 12px 18px;
+      padding: 118px 16px 18px;
    }
 
    .board-task-grid {
-      padding: 0 12px 120px 12px;
+      padding: 0 16px 120px;
       gap: 22px;
    }
 
    .board-task-directory-scroll {
-      padding-inline: 0;
+      padding-inline: 2px;
    }
 
    .find-task--mobile {

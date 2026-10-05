@@ -78,7 +78,7 @@
          .replace(/^["']|["']$/g, "")
          .trim();
       const name = String(creator.name || inferredName || "").trim();
-      typeTextElement.textContent = isExternal ? "External" : "Internal";
+      typeTextElement.textContent = isExternal ? "Extern" : "Internal";
       typeElement.classList.toggle("task-detail__creator-badge--external", isExternal);
       if (iconElement) iconElement.hidden = !isExternal;
       nameElement.textContent = name;
