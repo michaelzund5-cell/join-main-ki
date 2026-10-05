@@ -32,7 +32,7 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        800,
+        784,
         -400
       ],
       "typeVersion": 1,
@@ -149,7 +149,7 @@
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.4,
       "position": [
-        272,
+        32,
         -224
       ],
       "id": "82f359ac-6003-45c5-9053-0887a1f5fa4b",
@@ -190,7 +190,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        480,
+        240,
         -224
       ],
       "id": "a44ef93c-77bd-4346-a240-08ee1cd6953c",
@@ -203,7 +203,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        672,
+        432,
         -224
       ],
       "id": "96083b40-96f3-47bf-919c-7bc74b261ecd",
@@ -211,7 +211,7 @@
     },
     {
       "parameters": {
-        "modelName": "models/gemini-3.8-flash",
+        "modelName": "models/gemini-3.6-flash",
         "options": {
           "maxOutputTokens": 2048,
           "temperature": 0.1
@@ -245,6 +245,20 @@
         1104,
         144
       ]
+    },
+    {
+      "parameters": {
+        "url": "==https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/emailRequestUsage/{{ $now.setZone('Europe/Zurich').toFormat('yyyy-MM-dd') }}.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        624,
+        -208
+      ],
+      "id": "d4a3ed07-4b03-4a0f-849d-695a758c7e99",
+      "name": "Load Daily Request Counter"
     }
   ],
   "pinData": {},
@@ -329,7 +343,7 @@
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "Load Daily Request Counter",
             "type": "main",
             "index": 0
           }
@@ -357,6 +371,17 @@
           }
         ]
       ]
+    },
+    "Load Daily Request Counter": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -364,7 +389,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "53b5c2be-8ada-48cd-971f-6bef74f56900",
+  "versionId": "1447c0b5-9021-4dd8-acc8-38264d2b662e",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fb6f49aa55a9701e023ab489eaa6447f42dc3749e9339d5004b6190e7f1c2d08"
