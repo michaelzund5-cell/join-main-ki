@@ -3,21 +3,66 @@
   "nodes": [
     {
       "parameters": {
+        "method": "PUT",
+        "url": "=https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/emailRequestUsage/{{ $now.setZone('Europe/Zurich').toFormat('yyyy-MM-dd') }}.json",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \".sv\": {\n    \"increment\": 1\n  }\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2224,
+        1552
+      ],
+      "id": "ca7131e3-a2e1-4fa5-b9d9-c09856803fb6",
+      "name": "Increment Counter After AI Error",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $(\"Create Prompt for Gemini1\").first().json.requesterEmail }}",
+        "subject": "Join: Tageslimit erreicht",
+        "message": "Das tägliche Limit von 10 KI-Anfragen wurde erreicht. Deine Anfrage wurde nicht an die KI übermittelt. Bitte versuche es morgen erneut.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1808,
+        992
+      ],
+      "id": "814873c4-598a-47c5-b6f3-89817f6a2289",
+      "name": "Send Daily Limit Notice",
+      "webhookId": "d72aff76-14c6-4ad8-bedf-9edc879b2b63",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZxAJkmKbnrxawUJA",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
         "promptType": "define",
-        "text": "={{ $json.aiPrompt }}",
+        "text": "={{ $(\"Create Prompt for Gemini1\").first().json.aiPrompt }}",
         "hasOutputParser": true,
         "options": {
           "systemMessage": "Du analysierst eingehende E-Mails für Join. Halte dich exakt an das Ausgabeformat des Structured Output Parsers. Erfinde keine Angaben.",
           "maxIterations": 3
         }
       },
-      "id": "38318f0d-6f9e-4d99-b736-daa9be702606",
-      "name": "AI Agent",
+      "id": "fb345437-097a-4ab0-816b-f05749caaea9",
+      "name": "AI Agent1",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        896,
-        -128
+        1840,
+        1568
       ],
       "retryOnFail": true,
       "maxTries": 3,
@@ -32,12 +77,12 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        784,
-        -400
+        1760,
+        1328
       ],
       "typeVersion": 1,
-      "id": "d6e15315-cf7a-459b-bcaa-81d4eb4a6fdd",
-      "name": "Sticky Note"
+      "id": "a12828ea-7ca8-4b87-8170-9259730d1e4a",
+      "name": "Sticky Note1"
     },
     {
       "parameters": {
@@ -45,17 +90,17 @@
         "url": "https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/tasks.json",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  id: Date.now(),\n  createdAt: Date.now(),\n  title: $json.output.title,\n  description: $json.output.description,\n  category: $json.output.category,\n  priority: $json.output.priority,\n  date: $json.output.deadline || \"\",\n  status: \"triage\",\n  source: \"email\",\n  aiGenerated: true,\n  creator: {\n    name: $(\"Create Prompt for Gemini\").first().json.creatorName || \"\",\n    email: $(\"Create Prompt for Gemini\").first().json.senderEmail || \"\",\n    raw: $(\"Create Prompt for Gemini\").first().json.senderRaw || \"\",\n    type: \"external\"\n  },\n  assigned: [],\n  subtasks: ($json.output.subtasks || []).map((title, index) => ({\n    id: Date.now() + index + 1,\n    title,\n    text: title,\n    completed: false\n  }))\n} }}",
+        "jsonBody": "={{ {\n  id: Date.now(),\n  createdAt: Date.now(),\n  title: $(\"AI Agent1\").first().json.output.title,\n  description: $(\"AI Agent1\").first().json.output.description,\n  category: $(\"AI Agent1\").first().json.output.category,\n  priority: $(\"AI Agent1\").first().json.output.priority,\n  date: $(\"AI Agent1\").first().json.output.deadline || \"\",\n  status: \"triage\",\n  source: \"email\",\n  aiGenerated: true,\n  creator: {\n    name: $(\"Create Prompt for Gemini1\").first().json.creatorName || \"\",\n    email: $(\"Create Prompt for Gemini1\").first().json.senderEmail || \"\",\n    raw: $(\"Create Prompt for Gemini1\").first().json.senderRaw || \"\",\n    type: \"external\"\n  },\n  assigned: [],\n  subtasks: ($(\"AI Agent1\").first().json.output.subtasks || []).map((title, index) => ({\n    id: Date.now() + index + 1,\n    title,\n    text: title,\n    completed: false\n  }))\n} }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        1280,
-        -240
+        2608,
+        1360
       ],
-      "id": "65409d1d-176e-4ce6-a8ab-0a06e7abf0ec",
-      "name": "Create Ticket in Firebase",
+      "id": "4f03c91a-17bc-444b-83c6-09c6140a0500",
+      "name": "Create Ticket in Firebase1",
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 5000,
@@ -73,11 +118,11 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        1632,
-        -240
+        2384,
+        1344
       ],
-      "id": "ea6f97dd-a08f-4b85-b22d-a9cb6ba876a2",
-      "name": "Increment Daily Request Counter",
+      "id": "04d36a2a-2b59-46fc-81db-7525c9e013af",
+      "name": "Increment Daily Request Counter1",
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 3000,
@@ -85,18 +130,18 @@
     },
     {
       "parameters": {
-        "sendTo": "={{ $(\"Create Prompt for Gemini\").first().json.requesterEmail }}",
+        "sendTo": "={{ $(\"Create Prompt for Gemini1\").first().json.requesterEmail }}",
         "subject": "Join: Ticket erfolgreich erstellt",
-        "message": "=Hallo {{ $(\"Create Prompt for Gemini\").first().json.creatorName || \"\" }},\n\ndeine Anfrage wurde erfolgreich verarbeitet und als Ticket in der Triage-Spalte erstellt.\n\nTitel: {{ $(\"AI Agent\").first().json.output.title }}\n\nViele Grüße\nJoin",
+        "message": "=Hallo {{ $(\"Create Prompt for Gemini1\").first().json.creatorName || \"\" }},\n\ndeine Anfrage wurde erfolgreich verarbeitet und als Ticket in der Triage-Spalte erstellt.\n\nTitel: {{ $(\"AI Agent1\").first().json.output.title }}\n\nViele Grüße\nJoin",
         "options": {}
       },
-      "id": "6684ec5f-2536-460e-8894-2ff5841a2e1b",
-      "name": "Send Success Confirmation",
+      "id": "34e9e74d-765a-4e85-926e-fc451fbc10f3",
+      "name": "Send Success Confirmation1",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1952,
-        -192
+        2864,
+        1344
       ],
       "retryOnFail": true,
       "maxTries": 3,
@@ -111,18 +156,18 @@
     },
     {
       "parameters": {
-        "sendTo": "={{ $(\"Create Prompt for Gemini\").first().json.requesterEmail }}",
+        "sendTo": "={{ $(\"Create Prompt for Gemini1\").first().json.requesterEmail }}",
         "subject": "Join: Anfrage konnte nicht verarbeitet werden",
         "message": "Leider konnte deine Anfrage nicht automatisch verarbeitet werden. Es wurde kein vollständiges Ticket angelegt. Bitte versuche es später erneut.",
         "options": {}
       },
-      "id": "16912bd5-873e-4581-960e-4b738b53606a",
-      "name": "Send Error Notification",
+      "id": "4bc59be0-21fb-4edb-bad5-c705aac102e1",
+      "name": "Send Error Notification1",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1600,
-        144
+        2512,
+        1680
       ],
       "retryOnFail": true,
       "maxTries": 2,
@@ -149,11 +194,11 @@
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.4,
       "position": [
-        32,
-        -224
+        928,
+        1312
       ],
-      "id": "82f359ac-6003-45c5-9053-0887a1f5fa4b",
-      "name": "Receive New Request Emails",
+      "id": "35d1a66e-b4b2-467e-90cd-13d28f66776b",
+      "name": "Receive New Request Emails1",
       "credentials": {
         "gmailOAuth2": {
           "id": "ZxAJkmKbnrxawUJA",
@@ -190,11 +235,11 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        240,
-        -224
+        1120,
+        1312
       ],
-      "id": "a44ef93c-77bd-4346-a240-08ee1cd6953c",
-      "name": "Extract Sender, Subject and Body"
+      "id": "0feb8509-4f6b-40a7-8326-4c29c9f72129",
+      "name": "Extract Sender, Subject and Body1"
     },
     {
       "parameters": {
@@ -203,11 +248,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        432,
-        -224
+        1312,
+        1312
       ],
-      "id": "96083b40-96f3-47bf-919c-7bc74b261ecd",
-      "name": "Create Prompt for Gemini"
+      "id": "9c597fea-ba0b-41ce-8511-94473132d3a6",
+      "name": "Create Prompt for Gemini1"
     },
     {
       "parameters": {
@@ -217,13 +262,13 @@
           "temperature": 0.1
         }
       },
-      "id": "b3a39bb9-94b5-4a15-94a9-a78af6d79035",
-      "name": "Language Model for Ticket Extraction",
+      "id": "b8320506-c9fa-4664-82b1-b8979baeeffe",
+      "name": "Language Model for Ticket Extraction1",
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        864,
-        160
+        1808,
+        1744
       ],
       "credentials": {
         "googlePalmApi": {
@@ -237,146 +282,215 @@
         "schemaType": "manual",
         "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"title\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"description\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"category\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"Bug\",\n        \"User Story\",\n        \"Technical Task\"\n      ]\n    },\n    \"priority\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"urgent\",\n        \"medium\",\n        \"low\"\n      ]\n    },\n    \"deadline\": {\n      \"type\": \"string\",\n      \"description\": \"Deadline im Format DD/MM/YYYY oder leerer String, wenn keine Deadline genannt wurde\"\n    },\n    \"subtasks\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\n    \"title\",\n    \"description\",\n    \"category\",\n    \"priority\",\n    \"deadline\",\n    \"subtasks\"\n  ],\n  \"additionalProperties\": false\n}"
       },
-      "id": "dffe15d6-294c-4f0b-ae58-695a32c1579c",
-      "name": "Enforce Ticket Data Format",
+      "id": "be87ffed-000e-41bd-b5d4-30eb0ee05236",
+      "name": "Enforce Ticket Data Format1",
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1104,
-        144
+        2064,
+        1776
       ]
     },
     {
       "parameters": {
-        "url": "==https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/emailRequestUsage/{{ $now.setZone('Europe/Zurich').toFormat('yyyy-MM-dd') }}.json",
+        "url": "=https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/emailRequestUsage/{{ $now.setZone('Europe/Zurich').toFormat('yyyy-MM-dd') }}.json",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        624,
-        -208
+        1488,
+        1312
       ],
-      "id": "d4a3ed07-4b03-4a0f-849d-695a758c7e99",
-      "name": "Load Daily Request Counter"
+      "id": "65d88ef5-14f7-4d35-aa01-7dcbcb6963ef",
+      "name": "Load Daily Request Counter1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8a788665-2bc6-463e-8c2a-09d4c1450233",
+              "leftValue": "={{ Number($json.data ?? $json.value ?? $json.count ?? $json ?? 0) }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1584,
+        1024
+      ],
+      "id": "77583d3f-6966-4e5e-ab61-b0a9e3085891",
+      "name": "Below Daily Request Limit?1"
     }
   ],
   "pinData": {},
   "connections": {
-    "AI Agent": {
+    "Increment Counter After AI Error": {
       "main": [
         [
           {
-            "node": "Create Ticket in Firebase",
+            "node": "Send Error Notification1",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Send Error Notification",
+            "node": "Send Error Notification1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Create Ticket in Firebase": {
+    "AI Agent1": {
       "main": [
         [
           {
-            "node": "Increment Daily Request Counter",
+            "node": "Increment Daily Request Counter1",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Send Error Notification",
+            "node": "Increment Counter After AI Error",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Increment Daily Request Counter": {
+    "Create Ticket in Firebase1": {
       "main": [
         [
           {
-            "node": "Send Success Confirmation",
+            "node": "Send Success Confirmation1",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Send Error Notification",
+            "node": "Send Error Notification1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Receive New Request Emails": {
+    "Increment Daily Request Counter1": {
       "main": [
         [
           {
-            "node": "Extract Sender, Subject and Body",
+            "node": "Create Ticket in Firebase1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error Notification1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Extract Sender, Subject and Body": {
+    "Receive New Request Emails1": {
       "main": [
         [
           {
-            "node": "Create Prompt for Gemini",
+            "node": "Extract Sender, Subject and Body1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Create Prompt for Gemini": {
+    "Extract Sender, Subject and Body1": {
       "main": [
         [
           {
-            "node": "Load Daily Request Counter",
+            "node": "Create Prompt for Gemini1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Language Model for Ticket Extraction": {
+    "Create Prompt for Gemini1": {
+      "main": [
+        [
+          {
+            "node": "Load Daily Request Counter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Language Model for Ticket Extraction1": {
       "ai_languageModel": [
         [
           {
-            "node": "AI Agent",
+            "node": "AI Agent1",
             "type": "ai_languageModel",
             "index": 0
           }
         ]
       ]
     },
-    "Enforce Ticket Data Format": {
+    "Enforce Ticket Data Format1": {
       "ai_outputParser": [
         [
           {
-            "node": "AI Agent",
+            "node": "AI Agent1",
             "type": "ai_outputParser",
             "index": 0
           }
         ]
       ]
     },
-    "Load Daily Request Counter": {
+    "Load Daily Request Counter1": {
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "Below Daily Request Limit?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Below Daily Request Limit?1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Daily Limit Notice",
             "type": "main",
             "index": 0
           }
@@ -389,7 +503,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "1447c0b5-9021-4dd8-acc8-38264d2b662e",
+  "versionId": "ab8deedc-dc95-49ac-b923-e56c248d6ecb",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fb6f49aa55a9701e023ab489eaa6447f42dc3749e9339d5004b6190e7f1c2d08"
