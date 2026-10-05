@@ -73,13 +73,16 @@
 
    .headline {
       justify-content: flex-start;
+      padding-top: 0;
    }
 
    .headline_summary {
-      padding: 4px 16px 16px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 8px 16px;
       align-items: flex-start;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
    }
 
    .headline__name {
@@ -100,40 +103,53 @@
 
    .overview {
       padding: 0;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      overflow-x: hidden;
    }
 
    .overview__summary {
-      width: calc(100% - 32px);
+      width: calc(100% - 16px);
       max-width: 560px;
       min-width: 0;
       height: auto;
-      gap: 16px;
+      gap: 12px;
+      box-sizing: border-box;
    }
 
    .summary__card:hover {
       transform: scaleX(1.02) scaleY(1.04);
    }
 
+   .summary__card {
+      box-sizing: border-box;
+      max-width: 100%;
+   }
+
    .summary__todo {
       width: 100%;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      gap: 8px;
    }
 
    .summary__todo .todo__card {
       min-width: 0;
       min-height: 80px;
+      padding: 12px 8px;
+      gap: 8px;
+      box-sizing: border-box;
    }
 
    .summary__todo .todo__icon {
-      width: 40px;
-      height: 40px;
-      flex: 0 0 40px;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
    }
 
    .summary__tasks {
-      gap: 12px;
+      gap: 8px;
       width: 100%;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -142,15 +158,15 @@
    .summary__middle {
       width: 100%;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(96px, 120px);
-      gap: 16px;
+      grid-template-columns: minmax(0, 1fr) minmax(88px, 112px);
+      gap: 8px;
    }
 
    .summary__middle .summary__urgent {
       width: 100%;
       height: auto;
       min-height: 120px;
-      padding: 16px;
+      padding: 12px 8px;
    }
 
    .summary__tasks .tasks__card {
@@ -158,13 +174,13 @@
       height: auto;
       min-height: 88px;
       min-width: 0;
-      padding: 12px 6px;
+      padding: 12px 4px;
       flex: none;
       gap: 6px;
    }
 
    .summary__tasks .summary__number {
-      font-size: 40px;
+      font-size: clamp(32px, 10vw, 40px);
    }
 
    .summary__tasks .summary__text {
@@ -177,12 +193,12 @@
       width: 100%;
       height: auto;
       min-height: 120px;
-      padding: 20px 12px;
+      padding: 12px 6px;
       flex-basis: auto;
    }
 
    .summary__urgent {
-      gap: clamp(10px, 4vw, 28px);
+      gap: clamp(6px, 2.5vw, 16px);
    }
 
    .urgent__dividingLine {
@@ -192,16 +208,26 @@
    .summary__text {
       font-size: 16px;
       text-align: center;
+      min-width: 0;
    }
 
    .date__number {
-      font-size: 16px;
+      font-size: 15px;
    }
 
    .urgent__icon {
-      height: 40px;
-      width: 40px;
-      flex-basis: 40px;
+      height: 36px;
+      width: 36px;
+      flex-basis: 36px;
+   }
+
+   .urgent__priority,
+   .urgent__date {
+      min-width: 0;
+   }
+
+   .urgent__date {
+      overflow-wrap: anywhere;
    }
 
    .greetings__timeannouncement {
@@ -251,7 +277,7 @@
    }
 
    .summary__tasks .summary__text {
-      font-size: 12px;
+      font-size: 14px;
    }
 
    .summary__number {
@@ -259,22 +285,48 @@
    }
 
    .summary__urgent {
-      gap: 8px;
-      padding: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 72px) 2px minmax(0, 1fr);
+      align-items: center;
+      justify-content: stretch;
+      gap: 4px;
+      padding: 10px 6px;
+      overflow: hidden;
    }
 
    .urgent__priority {
-      gap: 6px;
+      width: 100%;
+      gap: 3px;
+      justify-content: flex-start;
    }
 
    .urgent__icon {
-      width: 32px;
-      height: 32px;
-      flex-basis: 32px;
+      width: 26px;
+      height: 26px;
+      flex-basis: 26px;
    }
 
    .urgent__date {
-      overflow-wrap: anywhere;
+      width: 100%;
+      gap: 4px;
+      align-items: flex-start;
+      overflow-wrap: normal;
+      word-break: normal;
+   }
+
+   .urgent__dividingLine {
+      width: 2px;
+      max-width: 2px;
+      justify-self: center;
+   }
+
+   .priority__card {
+      min-width: 0;
+   }
+
+   .priority__card .summary__number {
+      font-size: 32px;
+      line-height: 1;
    }
 
    .summary__email-requests {
@@ -296,7 +348,8 @@
    .date__number,
    .date__deadline,
    .priority__text {
-      font-size: 13px;
+      font-size: 14px;
+      line-height: 1.15;
    }
 
    .urgent__dividingLine {
