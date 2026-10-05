@@ -180,44 +180,6 @@ body.stakeholder-page {
    font-weight: 700;
 }
 
-.stakeholder-email-field {
-   width: min(100%, 420px);
-   display: flex;
-   flex-direction: column;
-   gap: 8px;
-}
-
-.stakeholder-email-field label {
-   color: var(--join-dark);
-   font-size: 16px;
-   font-weight: 600;
-}
-
-.stakeholder-email-field input {
-   width: 100%;
-   min-height: 48px;
-   padding: 12px 14px;
-   color: var(--join-dark);
-   font: inherit;
-   border: 1px solid #a8a8a8;
-   border-radius: 10px;
-   background: #ffffff;
-   outline: none;
-}
-
-.stakeholder-email-field input:focus {
-   border-color: #29abe2;
-}
-
-.stakeholder-email-field input[aria-invalid="true"] {
-   border-color: #ff3d00;
-}
-
-.stakeholder-email-error {
-   color: #ff3d00;
-   font-size: 14px;
-}
-
 /* =====================================================
    ILLUSTRATION
    ===================================================== */
@@ -584,13 +546,8 @@ body.stakeholder-page--choice {
       grid-row: 4;
    }
 
-   .stakeholder-copy .stakeholder-email-field {
-      width: 100%;
-      grid-row: 5;
-   }
-
    .stakeholder-copy .stakeholder-button {
-      grid-row: 6;
+      grid-row: 5;
    }
 
    .stakeholder-button {

@@ -3,7 +3,6 @@
 const REQUEST_DAILY_LIMIT = 10;
 const REQUEST_EMAIL = window.JOIN_CONFIG?.FEATURE_REQUEST_EMAIL || "diepausenclowns@gmail.com";
 const REQUEST_BASE_URL = window.JOIN_CONFIG?.BASE_URL || "";
-const REQUESTER_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Returns today's Zurich date key in YYYY-MM-DD form. */
 function getRequestDateKey() {
@@ -77,39 +76,14 @@ async function loadRequestCount() {
    }
 }
 
-/** Creates the Gmail compose URL and adds the requester's reply address. */
-function buildRequestEmailUrl(requesterEmail = "") {
+/** Creates the Gmail compose URL for a new feature request. */
+function buildRequestEmailUrl() {
    const subject = encodeURIComponent("Join feature request");
-   const replyAddress = String(requesterEmail).trim();
    const body = encodeURIComponent(
-      `Reply email: ${replyAddress}\n\nDescribe your request:\n\nSubtasks (optional):\n- \n- \n\nDeadline (optional):`
+      "Describe your request:\n\nSubtasks (optional):\n- \n- \n\nDeadline (optional):"
    );
    const recipient = encodeURIComponent(REQUEST_EMAIL);
    return `https://mail.google.com/mail/?view=cm&fs=1&to=${recipient}&su=${subject}&body=${body}`;
-}
-
-/** Validates the reply address and updates the request link. */
-function updateRequestEmailLink() {
-   const input = document.getElementById("requesterEmail");
-   const link = document.getElementById("createEmailRequest");
-   const error = document.getElementById("requesterEmailError");
-   const value = String(input?.value || "").trim();
-   const isValid = REQUESTER_EMAIL_PATTERN.test(value);
-   link?.setAttribute("href", isValid ? buildRequestEmailUrl(value) : "#");
-   input?.setAttribute("aria-invalid", String(Boolean(value) && !isValid));
-   if (error) error.hidden = !value || isValid;
-   return isValid;
-}
-
-/** Prevents opening Gmail until a valid reply address is available. */
-function handleRequestLinkClick(event) {
-   if (updateRequestEmailLink()) return;
-   event.preventDefault();
-   const input = document.getElementById("requesterEmail");
-   const error = document.getElementById("requesterEmailError");
-   input?.setAttribute("aria-invalid", "true");
-   if (error) error.hidden = false;
-   input?.focus();
 }
 
 /** Renders the available or reached-limit state. */
@@ -129,11 +103,7 @@ function renderRequestState(count) {
 
 /** Initializes request links and the daily usage state. */
 async function initializeStakeholderPage() {
-   const emailInput = document.getElementById("requesterEmail");
-   const requestLink = document.getElementById("createEmailRequest");
-   emailInput?.addEventListener("input", updateRequestEmailLink);
-   requestLink?.addEventListener("click", handleRequestLinkClick);
-   updateRequestEmailLink();
+   document.getElementById("createEmailRequest")?.setAttribute("href", buildRequestEmailUrl());
    document.getElementById("sendManualEmail")?.setAttribute("href", buildRequestEmailUrl());
    renderRequestState(await loadRequestCount());
 }
