@@ -1,0 +1,375 @@
+{
+  "name": "Join KI Issue Collector - AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.aiPrompt }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Du analysierst eingehende E-Mails für Join. Halte dich exakt an das Ausgabeformat des Structured Output Parsers. Erfinde keine Angaben.",
+          "maxIterations": 3
+        }
+      },
+      "id": "38318f0d-6f9e-4d99-b736-daa9be702606",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        896,
+        -128
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "\n## AI Handling\nGemini analyzes the incoming email and converts it into a structured Join ticket.\n\nOutput: title, description, category (Bug / User Story / Technical Task), priority (urgent / medium / low), deadline (DD/MM/YYYY or empty) and subtasks.\n\nThe output parser enforces this format. If the AI fails, the sender receives an error email.",
+        "height": 768,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        800,
+        -400
+      ],
+      "typeVersion": 1,
+      "id": "d6e15315-cf7a-459b-bcaa-81d4eb4a6fdd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/tasks.json",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  id: Date.now(),\n  createdAt: Date.now(),\n  title: $json.output.title,\n  description: $json.output.description,\n  category: $json.output.category,\n  priority: $json.output.priority,\n  date: $json.output.deadline || \"\",\n  status: \"triage\",\n  source: \"email\",\n  aiGenerated: true,\n  creator: {\n    name: $(\"Create Prompt for Gemini\").first().json.creatorName || \"\",\n    email: $(\"Create Prompt for Gemini\").first().json.senderEmail || \"\",\n    raw: $(\"Create Prompt for Gemini\").first().json.senderRaw || \"\",\n    type: \"external\"\n  },\n  assigned: [],\n  subtasks: ($json.output.subtasks || []).map((title, index) => ({\n    id: Date.now() + index + 1,\n    title,\n    text: title,\n    completed: false\n  }))\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1280,
+        -240
+      ],
+      "id": "65409d1d-176e-4ce6-a8ab-0a06e7abf0ec",
+      "name": "Create Ticket in Firebase",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://join-45b16-default-rtdb.europe-west1.firebasedatabase.app/emailRequestUsage/{{ $now.setZone('Europe/Zurich').toFormat('yyyy-MM-dd') }}.json",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \".sv\": {\n    \"increment\": 1\n  }\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1632,
+        -240
+      ],
+      "id": "ea6f97dd-a08f-4b85-b22d-a9cb6ba876a2",
+      "name": "Increment Daily Request Counter",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $(\"Create Prompt for Gemini\").first().json.requesterEmail }}",
+        "subject": "Join: Ticket erfolgreich erstellt",
+        "message": "=Hallo {{ $(\"Create Prompt for Gemini\").first().json.creatorName || \"\" }},\n\ndeine Anfrage wurde erfolgreich verarbeitet und als Ticket in der Triage-Spalte erstellt.\n\nTitel: {{ $(\"AI Agent\").first().json.output.title }}\n\nViele Grüße\nJoin",
+        "options": {}
+      },
+      "id": "6684ec5f-2536-460e-8894-2ff5841a2e1b",
+      "name": "Send Success Confirmation",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1952,
+        -192
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "webhookId": "c844231c-4a02-41c3-b8a8-f19ae089bdd4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZxAJkmKbnrxawUJA",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $(\"Create Prompt for Gemini\").first().json.requesterEmail }}",
+        "subject": "Join: Anfrage konnte nicht verarbeitet werden",
+        "message": "Leider konnte deine Anfrage nicht automatisch verarbeitet werden. Es wurde kein vollständiges Ticket angelegt. Bitte versuche es später erneut.",
+        "options": {}
+      },
+      "id": "16912bd5-873e-4581-960e-4b738b53606a",
+      "name": "Send Error Notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1600,
+        144
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "webhookId": "d7f8a0c1-386a-4bc1-a895-885e277db726",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZxAJkmKbnrxawUJA",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        272,
+        -224
+      ],
+      "id": "82f359ac-6003-45c5-9053-0887a1f5fa4b",
+      "name": "Receive New Request Emails",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZxAJkmKbnrxawUJA",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1f2352c-3959-4137-90dd-7b59d55dee7a",
+              "name": "sender",
+              "value": "={{ $json.From || $json.from || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "e38b3f1f-f63f-48ea-aa2c-da694d11a133",
+              "name": "subject",
+              "value": "={{ $json.Subject || $json.subject || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "a741b514-d795-4aaf-aca8-5b72a6411f1e",
+              "name": "body",
+              "value": "={{ $json.textPlain || $json.text || $json.snippet || \"\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        480,
+        -224
+      ],
+      "id": "a44ef93c-77bd-4346-a240-08ee1cd6953c",
+      "name": "Extract Sender, Subject and Body"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Bereitet eine eingehende E-Mail für Gemini auf und ermittelt\n * die Adresse, an die die Bestätigung gesendet werden soll.\n *\n * @returns {Array<{json: object}>} Normalisierte Anfrage und KI-Prompt\n */\nconst email = $input.first().json;\nconst values = Object.values(email);\n\nconst senderRaw = String(\n  email.sender ??\n  email.Sender ??\n  email.Absender ??\n  email.From ??\n  email.from ??\n  values[0] ??\n  \"\"\n).trim();\n\nconst senderMatch =\n  senderRaw.match(/<([^<>@]+@[^<>]+)>/) ||\n  senderRaw.match(/[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}/);\n\nconst senderEmail = senderMatch\n  ? String(senderMatch[1] || senderMatch[0]).trim()\n  : \"\";\n\nconst subject = String(\n  email.subject ??\n  email.Subject ??\n  email.Subjekt ??\n  email.Betreff ??\n  values[1] ??\n  \"\"\n).trim();\n\nconst body = String(\n  email.body ??\n  email.Body ??\n  email.Körper ??\n  email.Nachricht ??\n  email.textPlain ??\n  email.text ??\n  email.snippet ??\n  values[2] ??\n  \"\"\n).trim();\n\n/**\n * Sucht bevorzugt nach einem beschrifteten E-Mail-Feld\n * innerhalb der vom Benutzer abgesendeten Anfrage.\n */\nconst labeledEmailMatch = body.match(\n  /(?:e-?mail(?:-adresse)?|email address|reply-?to)\\s*[:=-]\\s*<?([\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,})>?/i\n);\n\nconst bodyEmailMatch = body.match(\n  /[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}/\n);\n\nconst requesterEmail = String(\n  labeledEmailMatch?.[1] ||\n  bodyEmailMatch?.[0] ||\n  senderEmail ||\n  \"\"\n).trim();\n\nconst creatorName = senderRaw\n  .replace(/<[^<>]+>/g, \"\")\n  .replace(senderEmail, \"\")\n  .replace(/^[\"']|[\"']$/g, \"\")\n  .trim();\n\nconst currentDate = new Intl.DateTimeFormat(\"en-GB\", {\n  timeZone: \"Europe/Zurich\",\n  day: \"2-digit\",\n  month: \"2-digit\",\n  year: \"numeric\"\n}).format(new Date());\n\nconst aiPrompt = `\nAnalysiere die folgende E-Mail und antworte ausschließlich mit gültigem JSON.\n\nDas heutige Datum ist: ${currentDate}\n\nErforderliches Format:\n{\n  \"title\": \"Kurzer prägnanter Titel\",\n  \"description\": \"Bereinigte Ticketbeschreibung ohne Subtasks\",\n  \"category\": \"Bug oder User Story oder Technical Task\",\n  \"priority\": \"urgent oder medium oder low\",\n  \"deadline\": \"DD/MM/YYYY oder leerer String\",\n  \"subtasks\": [\n    \"Erster Subtask\",\n    \"Zweiter Subtask\"\n  ]\n}\n\nRegeln:\n- Kategorie muss Bug, User Story oder Technical Task sein.\n- Priorität muss urgent, medium oder low sein.\n- Übernimm eine Deadline nur, wenn sie in der E-Mail genannt wurde.\n- Wenn keine Deadline genannt wurde, verwende einen leeren String.\n- Eine Deadline darf nicht in der Vergangenheit liegen.\n- Korrigiere eine ungültige oder vergangene Deadline auf ${currentDate}.\n- Verwende für Deadlines ausschließlich DD/MM/YYYY.\n- Extrahiere alle genannten Subtasks vollständig.\n- Jeder Subtask muss ein eigener Eintrag im Array sein.\n- Schreibe Subtasks nicht zusätzlich in die Beschreibung.\n- Wenn keine Subtasks genannt wurden, verwende [].\n- Die Beschreibung darf nur die eigentliche Anfrage enthalten.\n- Antworte ohne Markdown und ausschließlich mit dem JSON-Objekt.\n\nAbsendername: ${creatorName || \"Nicht angegeben\"}\nKontakt-E-Mail: ${requesterEmail}\nBetreff: ${subject}\nNachricht: ${body}\n`;\n\nreturn [\n  {\n    json: {\n      sender: senderEmail,\n      senderEmail,\n      requesterEmail,\n      senderRaw,\n      creatorName,\n      subject,\n      body,\n      aiPrompt\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -224
+      ],
+      "id": "96083b40-96f3-47bf-919c-7bc74b261ecd",
+      "name": "Create Prompt for Gemini"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.8-flash",
+        "options": {
+          "maxOutputTokens": 2048,
+          "temperature": 0.1
+        }
+      },
+      "id": "b3a39bb9-94b5-4a15-94a9-a78af6d79035",
+      "name": "Language Model for Ticket Extraction",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        864,
+        160
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "82FZjAqfmF6wyHk7",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"title\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"description\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"category\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"Bug\",\n        \"User Story\",\n        \"Technical Task\"\n      ]\n    },\n    \"priority\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"urgent\",\n        \"medium\",\n        \"low\"\n      ]\n    },\n    \"deadline\": {\n      \"type\": \"string\",\n      \"description\": \"Deadline im Format DD/MM/YYYY oder leerer String, wenn keine Deadline genannt wurde\"\n    },\n    \"subtasks\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\n    \"title\",\n    \"description\",\n    \"category\",\n    \"priority\",\n    \"deadline\",\n    \"subtasks\"\n  ],\n  \"additionalProperties\": false\n}"
+      },
+      "id": "dffe15d6-294c-4f0b-ae58-695a32c1579c",
+      "name": "Enforce Ticket Data Format",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        144
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create Ticket in Firebase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Ticket in Firebase": {
+      "main": [
+        [
+          {
+            "node": "Increment Daily Request Counter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Daily Request Counter": {
+      "main": [
+        [
+          {
+            "node": "Send Success Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive New Request Emails": {
+      "main": [
+        [
+          {
+            "node": "Extract Sender, Subject and Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Sender, Subject and Body": {
+      "main": [
+        [
+          {
+            "node": "Create Prompt for Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Prompt for Gemini": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Language Model for Ticket Extraction": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enforce Ticket Data Format": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "53b5c2be-8ada-48cd-971f-6bef74f56900",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb6f49aa55a9701e023ab489eaa6447f42dc3749e9339d5004b6190e7f1c2d08"
+  },
+  "nodeGroups": [],
+  "id": "tK0eHDFXZQv6e89H",
+  "tags": []
+}
